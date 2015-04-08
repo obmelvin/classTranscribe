@@ -1,3 +1,9 @@
+I've forked the project to work on my 242 project additions in isolation. This will make it
+easier to present my code in discussion and demonstrate what is specifically my work. In mid-late
+May I will work on merging everything back up to the main repo.
+
+
+original readme:
 # ClassTranscribe
 Class Transcribe is a project that utilizes crowdsourcing to quickly, reliably and accurately transcribe college lectures.
 

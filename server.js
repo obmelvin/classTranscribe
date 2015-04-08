@@ -8,7 +8,10 @@ router.get('/', function (request, response) {
   response.writeHead(200, {
     'Content-Type': 'text/html'
   });
-  response.end(indexHTML);
+  fs.readFile('search.html', function(err, file) {
+    response.end(file.toString());
+  });
+  //response.end(indexHTML);
 });
 
 var firstPassHTML = fs.readFileSync('index.html').toString();
@@ -58,4 +61,4 @@ router.get('/second/:videoIndex/:id', function (request, response) {
 });
 
 var server = http.createServer(router);
-server.listen(80);
+server.listen(8000);
