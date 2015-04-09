@@ -98,6 +98,22 @@ app.get('/second/*/*', function (req, res) {
   res.end(secondPassHTML);
 });
 
+//url should be of the form 'annotations/:videoIndex'
+app.get('/annotations', function (req, res) {
+  if(req.user) {
+    fs.readFile('annotations.html', function(err, file) {
+      if(err)
+        res.end(err);
+      res.writeHead(200, {
+        'Content-Type': 'text/html',
+        "Access-Control-Allow-Origin" : "*",
+        "Access-Control-Allow-Methods" : "POST, GET, PUT, DELETE, OPTIONS"
+      });
+      res.end(file.toString())
+    });
+  }
+});
+
 app.post('/login', function(req, res, next) {
   passport.authenticate('local-login', function(err, user, info) {
     if (err) { return next(err) }
@@ -108,7 +124,7 @@ app.post('/login', function(req, res, next) {
     }
     req.logIn(user, function(err) {
       if (err) { return next(err); }
-      return res.redirect('/');
+        res.end(JSON.stringify(user));
     });
   })(req, res, next);
 });
@@ -163,7 +179,8 @@ passport.use('local-signup', new LocalStrategy({
           });
         }
       });
-    }));
+    }
+));
 
 passport.use('local-login', new LocalStrategy({
       // by default, local strategy uses username and password, we will override with email
@@ -172,7 +189,6 @@ passport.use('local-login', new LocalStrategy({
       passReqToCallback : true // allows us to pass back the entire request to the callback
     },
     function(req, email, password, done) { // callback with email and password from our form
-
       dbConn.query('SELECT * FROM `users` WHERE `email` = ' + dbConn.escape(email),function(err,rows){
         if (err)
           return done(err);
@@ -186,11 +202,8 @@ passport.use('local-login', new LocalStrategy({
 
         // all is well, return successful user
         return done(null, rows[0]);
-
       });
-
-
-
-    }));
+    }
+));
 
 var server = app.listen(8000);

@@ -55,6 +55,27 @@ $(document).ready(function () {
 */
 function bindEventListeners() {
   $(".search-box").off().keyup(inputKeypress);
+
+  $("#loginForm").submit(function(event) {
+    event.preventDefault();
+    var email = $("#emailBox").val();
+    var password = $("#passwordBox").val();
+    $.post('/login', {'email': email, 'password': password}, function(data) {
+      handleLogin(data);
+    })
+  })
+}
+
+function handleLogin(data) {
+  user = JSON.parse(data);
+  if(user.userID) {
+    $('#loginForm').hide();
+    var welcomeHTML = '<p>Welcome ' + user.email + '</p>';
+    if(user.userType === 1) {
+      welcomeHTML += '<a href="/annotations">Add annotations</a>';
+    }
+    $("#welcome").html(welcomeHTML);
+  }
 }
 
 /*
