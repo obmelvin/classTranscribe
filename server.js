@@ -115,13 +115,38 @@ app.get('/annotations', function (req, res) {
   }
 });
 
-app.put('/addAnnotation', function (req, res) {
+app.put('/api/addAnnotation', function (req, res) {
   if(req.user.userType === 1) {
-    var query = util.format("INSERT INTO annotations(id, userID, video, time, content) VALUES(NULL, '%d', '%s', '%d', '%s')",
-                              req.user.userID, req.body.video, req.body.time, req.body.content);
+    var query = util.format("INSERT INTO annotations(id, userID, video, time, content) VALUES(NULL, '%d', %s, '%d', %s)",
+                              req.user.userID, dbConn.escape(req.body.video), dbConn.escape(parseInt(req.body.time)), dbConn.escape(req.body.content));
     console.log(query);
-    dbConn.query(query);
+    dbConn.query(query, function(err, results, fields) {
+      if(err) {
+        res.writeHead(500);
+        res.end(err.toString());
+      } else {
+        res.writeHead(204);
+        res.end();
+      }
+
+    });
   }
+});
+
+app.get('/api/loadAnnotations', function (req, res) {
+  var query = util.format("SELECT * FROM annotations WHERE video='%s'", req.query.video);
+  dbConn.query(query, function(err, results, fields) {
+    if(err) {
+      res.writeHead(500);
+      res.end(err);
+    } else {
+      res.writeHead(200, {
+        'Content-Type': 'application/json'
+      });
+      res.end(JSON.stringify(results));
+    }
+
+  });
 });
 
 app.post('/login', function(req, res, next) {
@@ -141,9 +166,7 @@ app.post('/login', function(req, res, next) {
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
-//   serialize users into and deserialize users out of the session.  Typically,
-//   this will be as simple as storing the user ID when serializing, and finding
-//   the user by ID when deserializing.
+//   serialize users into and deserialize users out of the session.
 passport.serializeUser(function(user, done) {
   done(null, user.userID);
 });

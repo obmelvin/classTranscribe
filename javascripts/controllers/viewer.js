@@ -23,6 +23,7 @@ function begin() {
   loadVideo(videoIndex);
   loadStartTime();
   loadCaptions(videoIndex);
+  loadAnnotations();
   bindEventListeners();
   changePlaybackSpeed();
 }
@@ -90,6 +91,30 @@ function loadCaptions(i) {
     $(".transcription-viewer-container").append(template);
   });
   updateHighlightedCaption(0);
+}
+
+/*
+ Retrieves all annotations for the given video and binds them to the timeupdate event
+*/
+function loadAnnotations() {
+  var videoName = $(".video-selector option:selected").text();
+  $.get("/api/loadAnnotations", { video: videoName }, function(annotations) {
+    $(".main-video").on("timeupdate", bindAnnotations(annotations));
+  });
+}
+
+function bindAnnotations(annotations) {
+  var wrapped = function() {
+    for (var index = 0; index < annotations.length; index++) {
+      if (this.currentTime > annotations[index].time) {
+        if($(".annotation#" + annotations[index].id).length === 0) { //only want to display annotation if isn't already on page
+          $(".annotations-container").append('<div class="annotation" id="' + annotations[index].id + '">' +
+          annotations[index].content + '</div>');
+        }
+      }
+    }
+  }
+  return wrapped;
 }
 
 /*

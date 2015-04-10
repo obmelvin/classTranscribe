@@ -75,15 +75,15 @@ function bindEventListeners() {
  Adds annotation to the DB tied to the current video time
  */
 function addAnnotation() {
-    var annotationText = $(".annotation-textarea").val();
+    var annotationTextarea = $(".annotation-textarea");
     var video = $(".main-video").get(0);
     var videoName = $(".video-selector option:selected").text();
     $.ajax({
         method: "PUT",
-        url: "/addAnnotation",
-        data: { content: annotationText, time: video.currentTime, video: videoName }
+        url: "/api/addAnnotation",
+        data: { content: annotationTextarea.val(), time: video.currentTime, video: videoName }
     }).done(function(data) {
-
+        annotationTextarea.val('');
     });
 }
 
