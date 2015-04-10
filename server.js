@@ -11,6 +11,8 @@ var LocalStrategy = require('passport-local').Strategy;
 var bcrypt = require('bcrypt-nodejs');
 var mysql = require('mysql');
 
+var dbConfig = require('./db.js');
+
 var app = express();
 var sessionSecret = '123sup3rs3cret'; //TODO: change to be actually secure
 
@@ -22,14 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
 
-var pool = mysql.createPool({
-  connectionLimit : 10,
-  host            : 'engr-cpanel-mysql.engr.illinois.edu',
-  database        : 'omelvin2_classTranscribe',
-  user            : 'omelvin2_dev',
-  password        : 'secret'
-  //connectTimeout  : 1000000
-});
+var pool = mysql.createPool(dbConfig.config);
 
 function User(id, username, email, password) {
   this.id = id;
