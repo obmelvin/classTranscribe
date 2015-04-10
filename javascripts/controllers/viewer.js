@@ -116,7 +116,7 @@ function bindAnnotations(annotations) {
         }
       }
     }
-  }
+  };
   return wrapper;
 }
 

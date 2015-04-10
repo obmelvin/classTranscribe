@@ -19,7 +19,9 @@
 
 .annotation {
   margin: 10px 0;
-  border: thin black;
+  border: 1px solid black;
+  padding: 2px 2px;
+  width: inherit;
 }
 
 h1 {

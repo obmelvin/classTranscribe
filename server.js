@@ -12,7 +12,6 @@ var bcrypt = require('bcrypt-nodejs');
 var mysql = require('mysql');
 
 var app = express();
-var SALT_WORK_FACTOR = 10;
 var sessionSecret = '123sup3rs3cret'; //TODO: change to be actually secure
 
 app.enable('trust proxy'); //this is necessary when using gulp as a proxy to enable livereload
@@ -158,8 +157,11 @@ app.post('/login', function(req, res, next) {
       return res.redirect('/')
     }
     req.logIn(user, function(err) {
-      if (err) { return next(err); }
-        res.end(JSON.stringify(user));
+      if (err)
+        return next(err);
+      var clientUser = JSON.parse(JSON.stringify(user));
+      clientUser.password = null;
+      res.end(JSON.stringify(user));
     });
   })(req, res, next);
 });

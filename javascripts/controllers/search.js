@@ -68,6 +68,9 @@ function showLogin() {
   $("#loginForm").show();
 }
 
+/*
+ Attempts to login and displays link to add annotations if the user is allowed to do so
+*/
 function login(event) {
   event.preventDefault();
   var email = $("#emailLogin").val();
@@ -91,6 +94,10 @@ function showSignUp() {
   $("#signUpForm").show();
 }
 
+/*
+ Creates a new account. Currently there is a bug where the response makes it seem like signup failed
+ despite the new user being properly created in DB
+*/
 function signUp(event) {
   event.preventDefault();
   var email = $("#emailSignUp").val();

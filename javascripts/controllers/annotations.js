@@ -23,6 +23,7 @@ function begin() {
     loadVideo(videoIndex);
     loadStartTime();
     loadCaptions(videoIndex);
+    loadExistingAnnotations();
     bindEventListeners();
     changePlaybackSpeed();
 }
@@ -59,6 +60,16 @@ function loadStartTime() {
         var base_url = windowLocation.substring(0, windowLocation.indexOf("?"));
         window.history.replaceState({}, document.title, base_url);
         //video.play();
+    });
+}
+
+function loadExistingAnnotations() {
+    var videoName = $(".video-selector option:selected").text();
+    $.get("/api/loadAnnotations", { video: videoName }, function(annotations) {
+        annotations.forEach(function(annotation, index, array) {
+            $(".existing-annotations-container").append('<div class="annotation" id="' + annotation.id + '">' +
+            annotation.content + '</div>');
+        })
     });
 }
 

@@ -32,6 +32,18 @@
     margin: 10px 0;
 }
 
+.existing-annotations-container {
+    margin: 10px 0;
+    width: 600px;
+}
+
+.annotation {
+    margin: 10px 0;
+    border: 1px solid black;
+    padding: 2px 2px;
+    width: inherit;
+}
+
 h1 {
     font-weight: bold;
     font-size: 36px;
