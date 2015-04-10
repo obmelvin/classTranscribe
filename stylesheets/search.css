@@ -13,6 +13,10 @@
   text-align: center;
 }
 
+.authentication-container {
+  margin-bottom: 40px;
+}
+
 
 h1 {
   font-weight: bold;
@@ -52,4 +56,13 @@ h1 {
 
 b {
   font-weight: bold;
+}
+
+#showLoginButton {
+  float: left;
+}
+
+#showSignUpButton {
+  float: left;
+  margin-left: 10px;
 }

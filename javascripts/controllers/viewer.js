@@ -103,8 +103,11 @@ function loadAnnotations() {
   });
 }
 
+/*
+ Iterates through the annotations and displays them at the appropriate time.
+*/
 function bindAnnotations(annotations) {
-  var wrapped = function() {
+  var wrapper = function() {
     for (var index = 0; index < annotations.length; index++) {
       if (this.currentTime > annotations[index].time) {
         if($(".annotation#" + annotations[index].id).length === 0) { //only want to display annotation if isn't already on page
@@ -114,7 +117,7 @@ function bindAnnotations(annotations) {
       }
     }
   }
-  return wrapped;
+  return wrapper;
 }
 
 /*

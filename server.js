@@ -8,7 +8,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var LocalStrategy = require('passport-local').Strategy;
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcrypt-nodejs');
 var mysql = require('mysql');
 
 var app = express();
@@ -164,6 +164,21 @@ app.post('/login', function(req, res, next) {
   })(req, res, next);
 });
 
+app.post('/signup', function(req, res, next) {
+  passport.authenticate('local-signup', function(err, user, info) {
+    if (err) { return next(err) }
+    //failed login currently just redirects to home page
+    if (!user) {
+      req.session.messages =  [info.message];
+      return res.redirect('/')
+    }
+    req.logIn(user, function(err) {
+      if (err) { return next(err); }
+      res.end(JSON.stringify(user));
+    });
+  })(req, res, next);
+});
+
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
 //   serialize users into and deserialize users out of the session.
@@ -193,22 +208,21 @@ passport.use('local-signup', new LocalStrategy({
         if (err)
           return done(err);
         if (rows.length) {
-          return done(null, false, req.flash('signupMessage', 'That email is already taken.'));
+          return done(null, false, { message: 'Email address already in use.' });
         } else {
           // if there is no user with that email
           // create the user
-          var newUserMysql = new Object();
+          var newUser = new Object();
 
-          newUserMysql.email    = email;
-          newUserMysql.password = password; // use the generateHash function in our user model
+          newUser.email    = email;
+          newUser.password = bcrypt.hashSync(password); // use the generateHash function in our user model
 
-          var insertQuery = 'INSERT INTO users ( email, password, userType ) values (' + dbConn.escape(email)
-              +','+ dbConn.escape(password) +')';
-          console.log(insertQuery);
+          var insertQuery = util.format('INSERT INTO users (email, password, userType) values (%s, %s, 0)',
+                                        dbConn.escape(newUser.email), dbConn.escape(newUser.password));
           dbConn.query(insertQuery,function(err,rows){
-            newUserMysql.id = rows.insertId;
+            newUser.id = rows.insertId;
 
-            return done(null, newUserMysql);
+            return done(null, newUser);
           });
         }
       });
@@ -230,7 +244,7 @@ passport.use('local-login', new LocalStrategy({
         }
 
         // if the user is found but the password is wrong
-        if (!( rows[0].password == password))
+        if (!( bcrypt.compareSync(password, rows[0].password)))
           return done(null, false, { message: 'Incorrect password.' });
 
         // all is well, return successful user

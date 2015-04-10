@@ -19,21 +19,39 @@
       <div class="header-container">
         <h1>Class Transcribe</h1>
       </div>
-      <form id="loginForm">
-        <div>
-          <label>Email:</label>
-          <input id="emailBox" type="text" name="email"/><br/>
+      <div class="authentication-container">
+        <p id="showLoginButton">Login</p>
+        <p id="showSignUpButton">Sign Up</p>
+        <form hidden id="loginForm">
+          <div>
+            <label>Email:</label>
+            <input id="emailLogin" type="text" name="email"/><br/>
+          </div>
+          <div>
+            <label>Password:</label>
+            <input id="passwordLogin" type="password" name="password"/>
+          </div>
+          <div>
+            <input type="submit" value="Submit"/>
+          </div>
+        </form>
+        <form hidden id="signUpForm">
+          <div>
+            <label>Email:</label>
+            <input id="emailSignUp" type="text" name="email"/><br/>
+          </div>
+          <div>
+            <label>Password:</label>
+            <input id="passwordSignUp" type="password" name="password"/>
+          </div>
+          <div>
+            <input type="submit" value="Submit"/>
+          </div>
+        </form>
+        <div id="welcome">
         </div>
-        <div>
-          <label>Password:</label>
-          <input id="passwordBox" type="password" name="password"/>
-        </div>
-        <div>
-          <input type="submit" value="Submit"/>
-        </div>
-      </form>
-      <div id="welcome">
       </div>
+
       <div class="search-container">
         <input class="search-box" type="text" placeholder="Enter a Systems Programming Term (eg. printf)"></input>
       </div>

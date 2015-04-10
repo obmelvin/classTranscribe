@@ -17,6 +17,11 @@
   margin: 10px 0;
 }
 
+.annotation {
+  margin: 10px 0;
+  border: thin black;
+}
+
 h1 {
   font-weight: bold;
   font-size: 36px;

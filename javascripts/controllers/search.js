@@ -56,26 +56,48 @@ $(document).ready(function () {
 function bindEventListeners() {
   $(".search-box").off().keyup(inputKeypress);
 
-  $("#loginForm").submit(function(event) {
-    event.preventDefault();
-    var email = $("#emailBox").val();
-    var password = $("#passwordBox").val();
-    $.post('/login', {'email': email, 'password': password}, function(data) {
-      handleLogin(data);
-    })
+  $("#showLoginButton").click(showLogin);
+  $("#showSignUpButton").click(showSignUp);
+  $("#loginForm").submit(login);
+  $("#signUpForm").submit(signUp);
+}
+
+function showLogin() {
+  $("#showLoginButton").hide();
+  $("#showSignUpButton").hide();
+  $("#loginForm").show();
+}
+
+function login(event) {
+  event.preventDefault();
+  var email = $("#emailLogin").val();
+  var password = $("#passwordLogin").val();
+  $.post('/login', {'email': email, 'password': password}, function(data) {
+    user = JSON.parse(data);
+    if(user.userID) {
+      $('#loginForm').hide();
+      var welcomeHTML = '<p>Welcome ' + user.email + '</p>';
+      if(user.userType === 1) {
+        welcomeHTML += '<a href="/annotations">Add annotations</a>';
+      }
+      $("#welcome").html(welcomeHTML);
+    }
   })
 }
 
-function handleLogin(data) {
-  user = JSON.parse(data);
-  if(user.userID) {
-    $('#loginForm').hide();
-    var welcomeHTML = '<p>Welcome ' + user.email + '</p>';
-    if(user.userType === 1) {
-      welcomeHTML += '<a href="/annotations">Add annotations</a>';
-    }
-    $("#welcome").html(welcomeHTML);
-  }
+function showSignUp() {
+  $("#showLoginButton").hide();
+  $("#showSignUpButton").hide();
+  $("#signUpForm").show();
+}
+
+function signUp(event) {
+  event.preventDefault();
+  var email = $("#emailSignUp").val();
+  var password = $("#passwordSignUp").val();
+  $.post('/signup', {'email': email, 'password': password}, function(data) {
+    console.log(data);
+  })
 }
 
 /*
