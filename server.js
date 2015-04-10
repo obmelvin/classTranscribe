@@ -22,12 +22,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
 
-var dbConn = mysql.createConnection({
-  host     : 'engr-cpanel-mysql.engr.illinois.edu',
-  database : 'omelvin2_classTranscribe',
-  user     : 'omelvin2_dev',
-  password : 'secret',
-  connectTimeout: 1000000
+var pool = mysql.createPool({
+  connectionLimit : 10,
+  host            : 'engr-cpanel-mysql.engr.illinois.edu',
+  database        : 'omelvin2_classTranscribe',
+  user            : 'omelvin2_dev',
+  password        : 'secret'
+  //connectTimeout  : 1000000
 });
 
 function User(id, username, email, password) {
@@ -116,35 +117,40 @@ app.get('/annotations', function (req, res) {
 
 app.put('/api/addAnnotation', function (req, res) {
   if(req.user.userType === 1) {
-    var query = util.format("INSERT INTO annotations(id, userID, video, time, content) VALUES(NULL, '%d', %s, '%d', %s)",
-                              req.user.userID, dbConn.escape(req.body.video), dbConn.escape(parseInt(req.body.time)), dbConn.escape(req.body.content));
-    console.log(query);
-    dbConn.query(query, function(err, results, fields) {
-      if(err) {
-        res.writeHead(500);
-        res.end(err.toString());
-      } else {
-        res.writeHead(204);
-        res.end();
-      }
+    pool.getConnection(function(connErr, conn) {
+      var query = util.format("INSERT INTO annotations(id, userID, video, time, content) VALUES(NULL, '%d', %s, '%d', %s)",
+          req.user.userID, conn.escape(req.body.video), conn.escape(parseInt(req.body.time)), conn.escape(req.body.content));
+      console.log(query);
+      conn.query(query, function(err, results, fields) {
+        conn.release();
+        if(err) {
+          res.writeHead(500);
+          res.end(err.toString());
+        } else {
+          res.writeHead(204);
+          res.end();
+        }
 
+      });
     });
   }
 });
 
 app.get('/api/loadAnnotations', function (req, res) {
   var query = util.format("SELECT * FROM annotations WHERE video='%s'", req.query.video);
-  dbConn.query(query, function(err, results, fields) {
-    if(err) {
-      res.writeHead(500);
-      res.end(err);
-    } else {
-      res.writeHead(200, {
-        'Content-Type': 'application/json'
-      });
-      res.end(JSON.stringify(results));
-    }
-
+  pool.getConnection(function(connErr, conn) {
+    conn.query(query, function(err, results, fields) {
+      conn.release();
+      if (err) {
+        res.writeHead(500);
+        res.end(err);
+      } else {
+        res.writeHead(200, {
+          'Content-Type': 'application/json'
+        });
+        res.end(JSON.stringify(results));
+      }
+    });
   });
 });
 
@@ -189,8 +195,11 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(id, done) {
-  dbConn.query('select * from users where userID = ' + dbConn.escape(id), function (err, rows) {
-    done(err, rows[0]);
+  pool.getConnection(function(dbErr, conn) {
+    conn.query('select * from users where userID = ' + conn.escape(id), function (err, rows) {
+      conn.release();
+      done(err, rows[0]);
+    });
   });
 });
 
@@ -204,29 +213,33 @@ passport.use('local-signup', new LocalStrategy({
 
       // find a user whose email is the same as the forms email
       // we are checking to see if the user trying to login already exists
-      dbConn.query('select * from users where email = ' + dbConn.escape(email), function(err, rows) {
-        console.log(rows);
-        console.log("above row object");
-        if (err)
-          return done(err);
-        if (rows.length) {
-          return done(null, false, { message: 'Email address already in use.' });
-        } else {
-          // if there is no user with that email
-          // create the user
-          var newUser = new Object();
+      pool.getConnection(function(dbErr, conn) {
+        conn.query('select * from users where email = ' + conn.escape(email), function (err, rows) {
+          if (err) {
+            conn.release();
+            return done(err);
+          }
 
-          newUser.email    = email;
-          newUser.password = bcrypt.hashSync(password); // use the generateHash function in our user model
+          if (rows.length) {
+            conn.release();
+            return done(null, false, {message: 'Email address already in use.'});
+          } else {
+            // if there is no user with that email
+            // create the user
+            var newUser = new Object();
 
-          var insertQuery = util.format('INSERT INTO users (email, password, userType) values (%s, %s, 0)',
-                                        dbConn.escape(newUser.email), dbConn.escape(newUser.password));
-          dbConn.query(insertQuery,function(err,rows){
-            newUser.id = rows.insertId;
+            newUser.email = email;
+            newUser.password = bcrypt.hashSync(password); // use the generateHash function in our user model
+            var insertQuery = util.format('INSERT INTO users (email, password, userType) values (%s, %s, 0)',
+                conn.escape(newUser.email), conn.escape(newUser.password));
+            conn.query(insertQuery, function (err, rows) {
+              conn.release();
+              newUser.id = rows.insertId;
 
-            return done(null, newUser);
-          });
-        }
+              return done(null, newUser);
+            });
+          }
+        });
       });
     }
 ));
@@ -238,19 +251,22 @@ passport.use('local-login', new LocalStrategy({
       passReqToCallback : true // allows us to pass back the entire request to the callback
     },
     function(req, email, password, done) { // callback with email and password from our form
-      dbConn.query('SELECT * FROM `users` WHERE `email` = ' + dbConn.escape(email),function(err,rows){
-        if (err)
-          return done(err);
-        if (!rows.length) {
-          return done(null, false, { message: 'Incorrect username.' });
-        }
+      pool.getConnection(function (dbErr, conn) {
+        conn.query('SELECT * FROM `users` WHERE `email` = ' + conn.escape(email), function (err, rows) {
+          conn.release();
+          if (err)
+            return done(err);
+          if (!rows.length) {
+            return done(null, false, {message: 'Incorrect username.'});
+          }
 
-        // if the user is found but the password is wrong
-        if (!( bcrypt.compareSync(password, rows[0].password)))
-          return done(null, false, { message: 'Incorrect password.' });
+          // if the user is found but the password is wrong
+          if (!( bcrypt.compareSync(password, rows[0].password)))
+            return done(null, false, {message: 'Incorrect password.'});
 
-        // all is well, return successful user
-        return done(null, rows[0]);
+          // all is well, return successful user
+          return done(null, rows[0]);
+        });
       });
     }
 ));
