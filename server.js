@@ -132,22 +132,28 @@ app.put('/api/addAnnotation', function (req, res) {
 });
 
 app.get('/api/loadAnnotations', function (req, res) {
-  var query = util.format("SELECT * FROM annotations WHERE video='%s'", req.query.video);
+  loadAnnotations(req.query.video, function (error, results) {
+    if (error) {
+      res.writeHead(500);
+      res.end(error);
+    } else {
+      res.writeHead(200, {
+        'Content-Type': 'application/json'
+      });
+      res.end(JSON.stringify(results));
+    }
+  });
+});
+
+function loadAnnotations(videoName, cb) {
+  var query = util.format("SELECT * FROM annotations WHERE video='%s'", videoName);
   pool.getConnection(function(connErr, conn) {
     conn.query(query, function(err, results, fields) {
       conn.release();
-      if (err) {
-        res.writeHead(500);
-        res.end(err);
-      } else {
-        res.writeHead(200, {
-          'Content-Type': 'application/json'
-        });
-        res.end(JSON.stringify(results));
-      }
-    });
-  });
-});
+      cb(err, results);
+    })
+  })
+}
 
 app.post('/login', function(req, res, next) {
   passport.authenticate('local-login', function(err, user, info) {
@@ -181,6 +187,8 @@ app.post('/signup', function(req, res, next) {
     });
   })(req, res, next);
 });
+
+
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
