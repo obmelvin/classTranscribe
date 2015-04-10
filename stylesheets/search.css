@@ -66,3 +66,7 @@ b {
   float: left;
   margin-left: 10px;
 }
+
+input {
+  margin: 3px 0;
+}

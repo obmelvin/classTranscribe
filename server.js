@@ -16,7 +16,7 @@ var dbConfig = require('./db.js');
 var app = express();
 var sessionSecret = '123sup3rs3cret'; //TODO: change to be actually secure
 
-app.enable('trust proxy'); //this is necessary when using gulp as a proxy to enable livereload
+//app.enable('trust proxy'); //this is necessary when using gulp as a proxy to enable livereload
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({secret: sessionSecret, saveUninitialized: true, resave: true}));
@@ -57,6 +57,9 @@ app.get('/first/*/*', function (req, res) {
   res.end(firstPassHTML);
 });
 
+/*
+ route handler for saving the first pass of transcriptions
+*/
 app.post('/first', function (req, res) {
   var stats = JSON.parse(req.post.stats);
   var transcriptions = JSON.parse(req.post.transcriptions);
@@ -70,6 +73,9 @@ app.post('/first', function (req, res) {
   res.end(JSON.stringify({success: true}));
 });
 
+/*
+ route handler for saving the second pass of transcriptions
+ */
 app.post('/second', function (req, res) {
   var stats = JSON.parse(req.post.stats);
   var transcriptions = JSON.parse(req.post.transcriptions);
@@ -94,7 +100,10 @@ app.get('/second/*/*', function (req, res) {
   res.end(secondPassHTML);
 });
 
-//url should be of the form 'annotations/:videoIndex'
+/*
+ route handler going to annotations page
+  eventually to match first and second pass url should be of the form 'annotations/:videoIndex'
+*/
 app.get('/annotations', function (req, res) {
   if(req.user) {
     fs.readFile('annotations.html', function(err, file) {
@@ -110,6 +119,9 @@ app.get('/annotations', function (req, res) {
   }
 });
 
+/*
+ API handler for adding an annotation
+*/
 app.put('/api/addAnnotation', function (req, res) {
   if(req.user.userType === 1) {
     pool.getConnection(function(connErr, conn) {
@@ -131,8 +143,11 @@ app.put('/api/addAnnotation', function (req, res) {
   }
 });
 
+/*
+ route handler for loading annotations
+*/
 app.get('/api/loadAnnotations', function (req, res) {
-  loadAnnotations(req.query.video, function (error, results) {
+  exports.loadAnnotations(req.query.video, function (error, results) {
     if (error) {
       res.writeHead(500);
       res.end(error);
@@ -145,7 +160,10 @@ app.get('/api/loadAnnotations', function (req, res) {
   });
 });
 
-module.exports.loadAnnotations = function loadAnnotations(videoName, cb) {
+/*
+ logic for querying DB for annotations
+*/
+exports.loadAnnotations = function loadAnnotations(videoName, cb) {
   var query = util.format("SELECT * FROM annotations WHERE video='%s'", videoName);
   pool.getConnection(function(connErr, conn) {
     conn.query(query, function(err, results, fields) {
@@ -153,8 +171,11 @@ module.exports.loadAnnotations = function loadAnnotations(videoName, cb) {
       cb(err, results);
     })
   })
-}
+};
 
+/*
+ route handler for logging in
+*/
 app.post('/login', function(req, res, next) {
   passport.authenticate('local-login', function(err, user, info) {
     if (err) { return next(err) }
@@ -173,6 +194,9 @@ app.post('/login', function(req, res, next) {
   })(req, res, next);
 });
 
+/*
+ route handler for creating a new account
+*/
 app.post('/signup', function(req, res, next) {
   passport.authenticate('local-signup', function(err, user, info) {
     if (err) { return next(err) }
@@ -206,6 +230,7 @@ passport.deserializeUser(function(id, done) {
   });
 });
 
+//local signup strategy for Passport
 passport.use('local-signup', new LocalStrategy({
       // by default, local strategy uses username and password, we will override with email
       usernameField : 'email',
@@ -213,9 +238,6 @@ passport.use('local-signup', new LocalStrategy({
       passReqToCallback : true // allows us to pass back the entire request to the callback
     },
     function(req, email, password, done) {
-
-      // find a user whose email is the same as the forms email
-      // we are checking to see if the user trying to login already exists
       pool.getConnection(function(dbErr, conn) {
         conn.query('select * from users where email = ' + conn.escape(email), function (err, rows) {
           if (err) {
@@ -223,16 +245,13 @@ passport.use('local-signup', new LocalStrategy({
             return done(err);
           }
 
-          if (rows.length) {
+          if (rows.length) { //email already in use
             conn.release();
             return done(null, false, {message: 'Email address already in use.'});
           } else {
-            // if there is no user with that email
-            // create the user
-            var newUser = new Object();
-
-            newUser.email = email;
-            newUser.password = bcrypt.hashSync(password); // use the generateHash function in our user model
+            // if there is no user with that email then create a user
+            var newUser = { email: email,
+                            password: bcrypt.hashSync(password) }; // use the generateHash function in our user model
             var insertQuery = util.format('INSERT INTO users (email, password, userType) values (%s, %s, 0)',
                 conn.escape(newUser.email), conn.escape(newUser.password));
             conn.query(insertQuery, function (err, rows) {
@@ -247,6 +266,7 @@ passport.use('local-signup', new LocalStrategy({
     }
 ));
 
+//local login strategy for Passport
 passport.use('local-login', new LocalStrategy({
       // by default, local strategy uses username and password, we will override with email
       usernameField : 'email',
@@ -259,12 +279,9 @@ passport.use('local-login', new LocalStrategy({
           conn.release();
           if (err)
             return done(err);
-          if (!rows.length) {
+          else if (!rows.length) //username doesn't exist
             return done(null, false, {message: 'Incorrect username.'});
-          }
-
-          // if the user is found but the password is wrong
-          if (!( bcrypt.compareSync(password, rows[0].password)))
+          else if (!( bcrypt.compareSync(password, rows[0].password))) // if the user is found but the password is wrong
             return done(null, false, {message: 'Incorrect password.'});
 
           // all is well, return successful user
