@@ -145,7 +145,7 @@ app.get('/api/loadAnnotations', function (req, res) {
   });
 });
 
-function loadAnnotations(videoName, cb) {
+module.exports.loadAnnotations = function loadAnnotations(videoName, cb) {
   var query = util.format("SELECT * FROM annotations WHERE video='%s'", videoName);
   pool.getConnection(function(connErr, conn) {
     conn.query(query, function(err, results, fields) {

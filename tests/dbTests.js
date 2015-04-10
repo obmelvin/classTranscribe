@@ -18,7 +18,9 @@ describe('/api/loadAnnotations', function() {
                                     userID: 2,
                                     video: videoName,
                                     content: 'learn more at http://linux.die.net/man/2/write' } ];
-            //expect(server.)
+            server.loadAnnotations(videoName, function(error, results) {
+                expect(results).should.equal(annotations);
+            })
         })
     })
 })
