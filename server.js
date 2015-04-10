@@ -1,4 +1,5 @@
 var fs = require('fs');
+var util = require('util');
 var http = require('http');
 var path = require('path');
 var express = require('express');
@@ -111,6 +112,15 @@ app.get('/annotations', function (req, res) {
       });
       res.end(file.toString())
     });
+  }
+});
+
+app.put('/addAnnotation', function (req, res) {
+  if(req.user.userType === 1) {
+    var query = util.format("INSERT INTO annotations(id, userID, video, time, content) VALUES(NULL, '%d', '%s', '%d', '%s')",
+                              req.user.userID, req.body.video, req.body.time, req.body.content);
+    console.log(query);
+    dbConn.query(query);
   }
 });
 

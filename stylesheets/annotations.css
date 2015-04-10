@@ -4,12 +4,12 @@
 
 .main-container {
     padding-top: 20px;
-    width: 1200px;
+    width: 600px;
     margin: 0 auto;
 }
 
 .viewer-container {
-    float: left;
+
 }
 
 .header-container, .video-container, .video_control-container {
@@ -22,8 +22,14 @@
 }
 
 .annotations-container {
-    float:left;
     width: 200px;
+
+}
+
+.annotation-textarea {
+    width: 600px;
+    height: 150px;
+    margin: 10px 0;
 }
 
 h1 {
