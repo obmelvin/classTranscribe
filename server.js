@@ -7,6 +7,7 @@ var passport = require('passport');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var SessionStore = require('express-mysql-session')
 var LocalStrategy = require('passport-local').Strategy;
 var bcrypt = require('bcrypt-nodejs');
 var mysql = require('mysql');
@@ -14,24 +15,24 @@ var mysql = require('mysql');
 var dbConfig = require('./db.js');
 
 var app = express();
+var sessionStore = new SessionStore(dbConfig.sessionStoreConfig);
 var sessionSecret = '123sup3rs3cret'; //TODO: change to be actually secure
 
 //app.enable('trust proxy'); //this is necessary when using gulp as a proxy to enable livereload
+//important to set static path before enabling sessions. otherwise initial requests for static resources will all
+//try to start their own session
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({secret: sessionSecret, saveUninitialized: true, resave: true}));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+  secret: sessionSecret,
+  store: sessionStore,
+  saveUninitialized: true,
+  resave: true}));
 app.use(passport.initialize());
 app.use(passport.session());
 
 var pool = mysql.createPool(dbConfig.config);
-
-function User(id, username, email, password) {
-  this.id = id;
-  this.username = username;
-  this.email = email;
-  this.password = password;
-}
 
 //var indexHTML = fs.readFileSync('search.html').toString();
 app.get('/', function (req, res) {
