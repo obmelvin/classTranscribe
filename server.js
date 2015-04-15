@@ -33,8 +33,6 @@ function User(id, username, email, password) {
   this.password = password;
 }
 
-var user = new User(1, 'oliver', 'obmelvin@gmail.com', 'secret');
-
 //var indexHTML = fs.readFileSync('search.html').toString();
 app.get('/', function (req, res) {
   res.writeHead(200, {
@@ -207,7 +205,7 @@ app.post('/signup', function(req, res, next) {
     }
     req.logIn(user, function(err) {
       if (err) { return next(err); }
-      res.end(JSON.stringify(user));
+      res.redirect('/')
     });
   })(req, res, next);
 });
@@ -256,8 +254,7 @@ passport.use('local-signup', new LocalStrategy({
                 conn.escape(newUser.email), conn.escape(newUser.password));
             conn.query(insertQuery, function (err, rows) {
               conn.release();
-              newUser.id = rows.insertId;
-
+              newUser.userID = rows.insertId;
               return done(null, newUser);
             });
           }
