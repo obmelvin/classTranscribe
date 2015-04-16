@@ -4,6 +4,12 @@ var globalSurfer;
 // Metrics object
 var metrics = {};
 
+// Video state
+var videoPlaying = false;
+
+// Surfer state
+var surferPlaying = false;
+
 // Start time global reference
 var startTime;
 
@@ -104,6 +110,9 @@ function bindVideoEvents() {
     if (Math.abs(globalSurferTime - videoCurrentTime) > 0.1) {
       globalSurfer.skip(video.currentTime - globalSurfer.getCurrentTime());
     }
+    if (videoPlaying && !surferPlaying) {
+      globalSurfer.play();
+    }
   };
 
   video.onended = function(e) {
@@ -114,9 +123,11 @@ function bindVideoEvents() {
     changePlaybackSpeed();
     loadWaveform(function () {
       video.onplay = function () {
+        videoPlaying = true;
         globalSurfer.play();
       }
       video.onpause = function () {
+        videoPlaying = false;
         globalSurfer.pause();
       }
     });
@@ -196,13 +207,22 @@ function loadCaptions(videoIndex) {
     $(".final-caption-black-bar").hide();
     var endWidth = $(this).width() - startWidth;
     incrementMetricCount("editSegmentLengthDrag", endWidth);
-  })
+  });
 
-  $(".final-caption-track, .waveform-container").off().scroll(function() {
+  $(".final-caption-track, .waveform-container").off().scroll(function (e) {
     $(".final-caption-track").scrollLeft($(this).scrollLeft());
     $(".waveform-container").scrollLeft($(this).scrollLeft());
     updateTimeLine($(this).scrollLeft());
+    if( $(".final-caption-track").scrollLeft() + $(".final-caption-track").width() + 252 >= $(".waveform-container").scrollLeft() + $(".waveform-container").width()) {
+      $(".final-caption-track").scrollLeft($(".waveform-container").scrollLeft());
+    }
   });
+
+  // $(".final-caption-track, .waveform-container").mousewheel(function(event, delta) {
+  //   $(".final-caption-track").get(0).scrollLeft -= (delta * 20);
+  //   $(".waveform-container").get(0).scrollLeft -= (delta * 20);
+  //   event.preventDefault();
+  // });
 }
 
 /*
@@ -267,6 +287,14 @@ function loadWaveform(cb) {
     var scrollLeft = video.currentTime * 64 - 200;
     $(".final-caption-track, .waveform-container").animate({scrollLeft: scrollLeft}, 500);
     $(".waveform-loading").addClass("hidden");
+  });
+
+  wavesurfer.on('play', function () {
+    surferPlaying = true;
+  });
+
+  wavesurfer.on('pause', function () {
+    surferPlaying = false;
   });
 
   wavesurfer.drawer.on('click', function (e, position) {
@@ -354,8 +382,8 @@ function save() {
     finalCaptions.push({
       text: $(el).text(),
       width: $(el).width()
-    })
-  })
+    });
+  });
   console.log(JSON.stringify(finalCaptions));
   return JSON.stringify(finalCaptions);
 }

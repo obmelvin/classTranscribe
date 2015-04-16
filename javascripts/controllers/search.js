@@ -55,7 +55,7 @@ $(document).ready(function () {
 */
 function bindEventListeners() {
   $(".search-box").off().keyup(inputKeypress);
-
+  $(".search-box").keyup(); // Trigger event to account for auto fill
   $("#showLoginButton").click(showLogin);
   $("#showSignUpButton").click(showSignUp);
   $("#loginForm").submit(login);

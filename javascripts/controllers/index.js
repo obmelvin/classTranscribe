@@ -15,6 +15,12 @@
   // Global reference to the wavesurfer
   var globalSurfer;
 
+  // Video state
+  var videoPlaying = false;
+
+  // Surfer state
+  var surferPlaying = false;
+
   // Start time global reference
   var startTime;
 
@@ -23,7 +29,7 @@
 */
 
 $(document).ready(function () {
-  setVideoFromUrl()
+  setVideoFromUrl();
   begin();
   initializeMetricsBaseInformation();
 });
@@ -93,6 +99,9 @@ function bindEventListeners() {
   $(".video-selector").off().change(begin);
   $(".playback-selector").off().change(changePlaybackSpeed);
   $(".transcription-input").off().keypress(inputKeypress);
+  $(".consent-agree").click(function () {
+    $(".consent-container").remove();
+  });
 }
 
 /*
@@ -107,6 +116,10 @@ function bindVideoEvents() {
     var videoCurrentTime = video.currentTime;
     if (Math.abs(globalSurferTime - videoCurrentTime) > 0.1) {
       globalSurfer.skip(videoCurrentTime - globalSurferTime);
+    }
+
+    if (videoPlaying && !surferPlaying) {
+      globalSurfer.play();
     }
 
     if (Math.abs(lastUpdate - videoCurrentTime) > 9) {
@@ -124,9 +137,11 @@ function bindVideoEvents() {
     changePlaybackSpeed();
     loadWaveform(function () {
       video.onplay = function () {
+        videoPlaying = true;
         globalSurfer.play();
       }
       video.onpause = function () {
+        videoPlaying = false;
         globalSurfer.pause();
       }
     });
@@ -255,6 +270,14 @@ function loadWaveform(cb) {
     var scrollLeft = video.currentTime * 64 - 200;
     $(".transcription-track, .final-transcription-track, .waveform-container").animate({scrollLeft: scrollLeft}, 500);
     $(".waveform-loading").addClass("hidden");
+  });
+
+  wavesurfer.on('play', function () {
+    surferPlaying = true;
+  });
+
+  wavesurfer.on('pause', function () {
+    surferPlaying = false;
   });
 
   wavesurfer.drawer.on('click', function (e, position) {
