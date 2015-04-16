@@ -59,7 +59,10 @@ function loadStartTime() {
     var windowLocation = window.location.toString();
     var base_url = windowLocation.substring(0, windowLocation.indexOf("?"));
     window.history.replaceState({}, document.title, base_url);
-    video.play();
+    //easy hack to prevent autoplay on the annotations page
+    if(windowLocation.includes('viewer')) {
+      video.play();
+    }
   });
 }
 

@@ -118,35 +118,41 @@ app.get('/annotations', function (req, res) {
   }
 });
 
+
 /*
  API handler for adding an annotation
 */
 app.put('/api/addAnnotation', function (req, res) {
   if(req.user.userType === 1) {
-    pool.getConnection(function(connErr, conn) {
-      var query = util.format("INSERT INTO annotations(id, userID, video, time, content) VALUES(NULL, '%d', %s, '%d', %s)",
-          req.user.userID, conn.escape(req.body.video), conn.escape(parseInt(req.body.time)), conn.escape(req.body.content));
-      console.log(query);
-      conn.query(query, function(err, results, fields) {
-        conn.release();
-        if(err) {
-          res.writeHead(500);
-          res.end(err.toString());
-        } else {
-          res.writeHead(204);
-          res.end();
-        }
-
-      });
+    addAnnotations(req.user.userID, req.body.video, req.body.time, req.body.content, function(err, results) {
+      if(err) {
+        res.writeHead(500);
+        res.end(err.toString());
+      } else {
+        res.writeHead(204);
+        res.end();
+      }
     });
   }
 });
+
+function addAnnotations(userID, video, time, content, cb) {
+  pool.getConnection(function(connErr, conn) {
+    var query = util.format("INSERT INTO annotations(id, userID, video, time, content) VALUES(NULL, '%d', %s, '%d', %s)",
+        userID, conn.escape(video), conn.escape(parseInt(time)), conn.escape(content));
+    conn.query(query, function(err, results, fields) {
+      conn.release();
+      cb(err, results);
+    });
+  });
+}
+exports.addAnnotations = addAnnotations;
 
 /*
  route handler for loading annotations
 */
 app.get('/api/loadAnnotations', function (req, res) {
-  exports.loadAnnotations(req.query.video, function (error, results) {
+  loadAnnotations(req.query.video, function (error, results) {
     if (error) {
       res.writeHead(500);
       res.end(error);
@@ -162,7 +168,7 @@ app.get('/api/loadAnnotations', function (req, res) {
 /*
  logic for querying DB for annotations
 */
-exports.loadAnnotations = function loadAnnotations(videoName, cb) {
+function loadAnnotations(videoName, cb) {
   var query = util.format("SELECT * FROM annotations WHERE video='%s'", videoName);
   pool.getConnection(function(connErr, conn) {
     conn.query(query, function(err, results, fields) {
@@ -171,6 +177,7 @@ exports.loadAnnotations = function loadAnnotations(videoName, cb) {
     })
   })
 };
+exports.loadAnnotations = loadAnnotations;
 
 /*
  route handler for logging in
@@ -210,8 +217,6 @@ app.post('/signup', function(req, res, next) {
     });
   })(req, res, next);
 });
-
-
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
