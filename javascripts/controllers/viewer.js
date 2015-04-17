@@ -5,6 +5,8 @@
   var lastTime = -1;
   // Length of current segment
   var segmentLength = 0;
+
+  var annotationComponents = require('./annotationReactComponents');
 /*
   End Global Variables
 */
@@ -102,9 +104,17 @@ function loadCaptions(i) {
 */
 function loadAnnotations() {
   var videoName = $(".video-selector option:selected").text();
-  $.get("/api/loadAnnotations", { video: videoName }, function(annotations) {
-    $(".main-video").on("timeupdate", bindAnnotations(annotations));
-  });
+
+  React.render(
+      <annotationComponents.annotationBox url="/api/loadAnnotations" />,
+      $('.annotations-container')[0],
+      function() {
+        bindAnnotations();
+      }
+  );
+  //$.get("/api/loadAnnotations", { video: videoName }, function(annotations) {
+  //  $(".main-video").on("timeupdate", bindAnnotations(annotations));
+  //});
 }
 
 /*
@@ -124,6 +134,9 @@ function bindAnnotations(annotations) {
   return wrapper;
 }
 
+/*
+ Renders the components to suggest a transcription change
+ */
 function editCaption() {
   var videoName = $(".video-selector option:selected").text();
   var time = this.dataset.time;

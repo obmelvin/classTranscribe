@@ -320,7 +320,7 @@ passport.use('local-login', new LocalStrategy({
     }
 ));
 
-var server = app.listen(8001);
+var server = app.listen(8000);
 
 process.on('SIGTERM', function() {
   server.close(function () {
