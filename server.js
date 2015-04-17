@@ -104,7 +104,7 @@ app.get('/second/*/*', function (req, res) {
   eventually to match first and second pass url should be of the form 'annotations/:videoIndex'
 */
 app.get('/annotations', function (req, res) {
-  if(req.user) {
+  //if(req.user) {
     fs.readFile('annotations.html', function(err, file) {
       if(err)
         res.end(err);
@@ -115,9 +115,8 @@ app.get('/annotations', function (req, res) {
       });
       res.end(file.toString())
     });
-  }
+  //}
 });
-
 
 /*
  API handler for adding an annotation
@@ -295,3 +294,15 @@ passport.use('local-login', new LocalStrategy({
 ));
 
 var server = app.listen(8000);
+
+process.on('SIGTERM', function() {
+  server.close(function () {
+    process.exit(0);
+  })
+})
+
+process.on('SIGINT', function() {
+  server.close(function () {
+    process.exit(0);
+  })
+})

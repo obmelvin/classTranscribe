@@ -11,7 +11,13 @@ var segmentLength = 0;
 
 $(document).ready(function () {
     //setVideoFromUrl();
-    //begin();
+    begin();
+
+    React.render(
+        <AnnotationBox url="/api/loadAnnotations" />,
+        $('.existing-annotations-container')[0]
+        //document.getElementById('existing-annotations-container')
+    );
 });
 
 /*
@@ -23,22 +29,15 @@ function begin() {
     loadCaptions(videoIndex);
     //loadExistingAnnotations();
     bindEventListeners();
-    reactCode();
 }
 
-function reactCode() {
-    React.render(
-        <AnnotationBox url="/api/loadAnnotations" />,
-        document.getElementById('example')
-    );
-}
 
-//<div class="icon icon-action-black-ic_done_black_24dp"></div>
 var Annotation = React.createClass({
     render: function() {
         return (
             <div>
-                {this.props.children}
+                <p>{this.props.children}</p>
+                <div className="icon-action-black icon-action-black-ic_done_black_24dp"></div>
             </div>
         );
     }
@@ -59,6 +58,17 @@ var AnnotationList = React.createClass({
            </div>
        );
    }
+});
+
+var CreateAnnotationBox = React.createClass({
+    render: function() {
+        return (
+            <div className="createAnnotationBox">
+                <textarea class="annotation-textarea"></textarea>
+                <button class="add-annotation-button">Add an annotation at the current time</button>
+            </div>
+        );
+    }
 });
 
 var AnnotationBox = React.createClass({

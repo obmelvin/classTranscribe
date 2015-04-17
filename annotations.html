@@ -9,7 +9,7 @@
     <script src="/javascripts/data/captions.js"></script>
     <script src="/javascripts/build/viewer.js"></script>
     <!--<script src="/javascripts/controllers/annotations.js"></script>-->
-    <script src="/javascripts/build/annotations.js"></script>
+
     <!-- End Javascript -->
 
     <!-- Begin Stylesheets -->
@@ -19,33 +19,31 @@
     <!-- End Stylesheets -->
 </head>
 <body>
-<div class="main-container">
-    <div class="header-container">
-        <h1>Class Transcribe</h1>
-    </div>
-    <div class="viewer-container">
-        <div class="video-container">
-            <video class="main-video" width="600" controls>
-                <source class="main-video-source" src="http://cs-education.github.io/sysassets/mp4/0010-HelloWorld-v2.mp4" type="video/mp4">
-            </video>
+    <div class="main-container">
+        <div class="header-container">
+            <h1>Class Transcribe</h1>
         </div>
-        <div class="video_control-container">
-            <select class="video-selector"></select>
-            <select class="playback-selector">
-                <option selected value="1">Playback 1x</option>
-            </select>
+        <div class="viewer-container">
+            <div class="video-container">
+                <video class="main-video" width="600" controls>
+                    <source class="main-video-source" src="http://cs-education.github.io/sysassets/mp4/0010-HelloWorld-v2.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="video_control-container">
+                <select class="video-selector"></select>
+                <select class="playback-selector">
+                    <option selected value="1">Playback 1x</option>
+                </select>
+            </div>
+            <div class="transcription-viewer-container"></div>
         </div>
-        <div class="transcription-viewer-container"></div>
-    </div>
-    <div id="example"></div>
-    <div class="annotations-container">
-        <textarea class="annotation-textarea"></textarea>
-        <button class="add-annotation-button">Add an annotation at the current time</button>
-        <div class="existing-annotations-container">
-            <h3>Existing Annotations</h3>
+        <div class="annotations-container">
+
+            <div class="existing-annotations-container"></div>
         </div>
+
     </div>
 
-</div>
+    <script src="/javascripts/build/annotations.js"></script>
 </body>
 </html>
