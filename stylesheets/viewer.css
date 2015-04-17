@@ -4,7 +4,7 @@
 
 .main-container {
   padding-top: 20px;
-  width: 600px;
+  width: 1000px;
   margin: 0 auto;
 }
 
@@ -15,6 +15,14 @@
 
 .transcription-container {
   margin: 10px 0;
+}
+
+.viewer-container {
+  float: left;
+}
+
+.suggestions-container, .suggestionBox {
+  float: left;
 }
 
 .annotation {

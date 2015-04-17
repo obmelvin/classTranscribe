@@ -24,6 +24,7 @@ function begin() {
   loadStartTime();
   loadCaptions(videoIndex);
   loadAnnotations();
+  loadSuggestedChanges();
   bindEventListeners();
   changePlaybackSpeed();
 }
@@ -124,6 +125,13 @@ function bindAnnotations(annotations) {
   return wrapper;
 }
 
+function loadSuggestedChanges() {
+  React.render(
+      <SuggestionsBox url="/api/getSuggestedChanges" />,
+      $(".suggestions-container")[0]
+  )
+}
+
 function editCaption() {
   var videoName = $(".video-selector option:selected").text();
   var time = this.dataset.time;
@@ -159,6 +167,56 @@ var CaptionEditBox = React.createClass({
           <button onClick={this.handleSubmit}>Suggest improvement</button>
         </div>
     )
+  }
+});
+
+var SuggestionsBox = React.createClass({
+  getInitialState: function() {
+    return {data: []};
+  },
+  componentDidMount: function() {
+    var self = this;
+    var videoName = $(".video-selector option:selected").text();
+    $.get(self.props.url, {video: videoName}, function(suggestionsData) {
+      self.setState({data: JSON.parse(suggestionsData)});
+    })
+  },
+  render: function() {
+    return (
+      <div className="suggestionBox">
+        <h3>Suggested Transcription Changes</h3>
+        <SuggestionList data={this.state.data} />
+      </div>
+    );
+  }
+});
+
+var Suggestion = React.createClass({
+  render: function() {
+    return (
+        <div>
+          <p>{this.props.children}</p>
+          <div className="icon-action-black icon-action-black-ic_thumb_up_black_24dp"></div>
+          <div className="icon-action-black icon-action-black-ic_thumb_down_black_24dp"></div>
+        </div>
+    );
+  }
+});
+
+var SuggestionList = React.createClass({
+  render: function() {
+    var suggestionNodes = this.props.data.map(function (suggestion) {
+      return (
+          <Suggestion key={suggestion.suggestionID} annotationID={suggestion.suggestionID} creator={suggestion.userID}>
+            {suggestion.suggestion}
+          </Suggestion>
+      );
+    });
+    return (
+        <div className="suggestionList">
+          {suggestionNodes}
+        </div>
+    );
   }
 });
 

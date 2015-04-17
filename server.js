@@ -147,6 +147,9 @@ function addAnnotations(userID, video, time, content, cb) {
 }
 exports.addAnnotations = addAnnotations;
 
+/*
+ route handler for suggesting a change to a transcription
+ */
 app.put('/api/suggestTranscriptChange', function (req, res) {
   //console.log("suggest session" + req.session);
   suggestTranscriptionChange(req.user.userID, req.body.video, req.body.time, req.body.suggestion, function(err, results) {
@@ -160,6 +163,9 @@ app.put('/api/suggestTranscriptChange', function (req, res) {
   })
 });
 
+/*
+ DB logic for adding a suggested transcription change
+ */
 function suggestTranscriptionChange(userID, video, time, suggestion, cb) {
   pool.getConnection(function(connErr, conn) {
     var query = util.format("INSERT INTO transcriptionSuggestions(suggestionID, userID, video, time, suggestion) VALUES(NULL, '%d', %s, '%d', %s)",
@@ -171,6 +177,35 @@ function suggestTranscriptionChange(userID, video, time, suggestion, cb) {
   });
 }
 exports.suggestTranscriptionChange = suggestTranscriptionChange;
+
+/*
+ route handler for getting all suggested changes for a video
+ */
+app.get('/api/getSuggestedChanges', function (req, res) {
+  getSuggestedChanges(req.query.video, function(err, results) {
+    if(err) {
+      res.writeHead(500);
+      res.end(err.toString());
+    } else {
+      res.writeHead(200);
+      res.end(JSON.stringify(results));
+    }
+  })
+});
+
+/*
+ DB logic for getting all suggested changes for a particular video
+ */
+function getSuggestedChanges(videoName, cb) {
+  pool.getConnection(function (connErr, conn) {
+    var query = util.format("SELECT * FROM transcriptionSuggestions WHERE video='%s'", videoName);
+    console.log(query);
+    conn.query(query, function(err, results, fields) {
+      conn.release();
+      cb(err, results);
+    });
+  })
+}
 
 /*
  route handler for loading annotations

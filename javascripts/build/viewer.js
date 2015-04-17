@@ -24,6 +24,7 @@ function begin() {
   loadStartTime();
   loadCaptions(videoIndex);
   loadAnnotations();
+  loadSuggestedChanges();
   bindEventListeners();
   changePlaybackSpeed();
 }
@@ -124,6 +125,13 @@ function bindAnnotations(annotations) {
   return wrapper;
 }
 
+function loadSuggestedChanges() {
+  React.render(
+      React.createElement(SuggestionsBox, {url: "/api/getSuggestedChanges"}),
+      $(".suggestions-container")[0]
+  )
+}
+
 function editCaption() {
   var videoName = $(".video-selector option:selected").text();
   var time = this.dataset.time;
@@ -159,6 +167,56 @@ var CaptionEditBox = React.createClass({displayName: "CaptionEditBox",
           React.createElement("button", {onClick: this.handleSubmit}, "Suggest improvement")
         )
     )
+  }
+});
+
+var SuggestionsBox = React.createClass({displayName: "SuggestionsBox",
+  getInitialState: function() {
+    return {data: []};
+  },
+  componentDidMount: function() {
+    var self = this;
+    var videoName = $(".video-selector option:selected").text();
+    $.get(self.props.url, {video: videoName}, function(suggestionsData) {
+      self.setState({data: JSON.parse(suggestionsData)});
+    })
+  },
+  render: function() {
+    return (
+      React.createElement("div", {className: "suggestionBox"}, 
+        React.createElement("h3", null, "Suggested Transcription Changes"), 
+        React.createElement(SuggestionList, {data: this.state.data})
+      )
+    );
+  }
+});
+
+var Suggestion = React.createClass({displayName: "Suggestion",
+  render: function() {
+    return (
+        React.createElement("div", null, 
+          React.createElement("p", null, this.props.children), 
+          React.createElement("div", {className: "icon-action-black icon-action-black-ic_thumb_up_black_24dp"}), 
+          React.createElement("div", {className: "icon-action-black icon-action-black-ic_thumb_down_black_24dp"})
+        )
+    );
+  }
+});
+
+var SuggestionList = React.createClass({displayName: "SuggestionList",
+  render: function() {
+    var suggestionNodes = this.props.data.map(function (suggestion) {
+      return (
+          React.createElement(Suggestion, {key: suggestion.suggestionID, annotationID: suggestion.suggestionID, creator: suggestion.userID}, 
+            suggestion.suggestion
+          )
+      );
+    });
+    return (
+        React.createElement("div", {className: "suggestionList"}, 
+          suggestionNodes
+        )
+    );
   }
 });
 
