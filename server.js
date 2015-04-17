@@ -199,12 +199,40 @@ app.get('/api/getSuggestedChanges', function (req, res) {
 function getSuggestedChanges(videoName, cb) {
   pool.getConnection(function (connErr, conn) {
     var query = util.format("SELECT * FROM transcriptionSuggestions WHERE video='%s'", videoName);
-    console.log(query);
     conn.query(query, function(err, results, fields) {
       conn.release();
       cb(err, results);
     });
   })
+}
+
+app.put('/api/submitSuggestionVote', function (req, res) {
+  submitSuggestionVote(req.body.suggestionID, req.user.userID, req.body.vote, function (err, results) {
+    if(err) {
+      res.writeHead(500);
+      res.end(err.toString());
+    } else {
+      res.writeHead(204);
+      res.end();
+    }
+  })
+});
+
+function submitSuggestionVote(suggestionID, userID, vote, cb) {
+  if(vote) {
+    vote = 1;
+  } else {
+    vote = -1;
+  }
+  pool.getConnection(function(connErr, conn) {
+    var query = util.format("INSERT INTO suggestionVotes(voteID, suggestionID, userID, vote) VALUES(NULL, '%d', %d, '%d')",
+        conn.escape(suggestionID), userID, vote);
+    console.log(query);
+    conn.query(query, function(err, results, fields) {
+      conn.release();
+      cb(err, results);
+    });
+  });
 }
 
 /*

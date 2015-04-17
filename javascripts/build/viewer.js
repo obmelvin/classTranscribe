@@ -192,12 +192,26 @@ var SuggestionsBox = React.createClass({displayName: "SuggestionsBox",
 });
 
 var Suggestion = React.createClass({displayName: "Suggestion",
+  handleVote: function(event) {
+    if($(event.target).hasClass('voteUp')) {
+      var vote = true;
+    } else {
+      var vote = false;
+    }
+    $.ajax({
+      method: "PUT",
+      url: "/api/submitSuggestionVote",
+      data: { suggestionID: this.props.suggestionID, vote: vote }
+    }).done(function(data) {
+
+    })
+  },
   render: function() {
     return (
         React.createElement("div", null, 
           React.createElement("p", null, this.props.children), 
-          React.createElement("div", {className: "icon-action-black icon-action-black-ic_thumb_up_black_24dp"}), 
-          React.createElement("div", {className: "icon-action-black icon-action-black-ic_thumb_down_black_24dp"})
+          React.createElement("div", {onClick: this.handleVote, className: "voteUp icon-action-black icon-action-black-ic_thumb_up_black_24dp"}), 
+          React.createElement("div", {onClick: this.handleVote, className: "voteDown icon-action-black icon-action-black-ic_thumb_down_black_24dp"})
         )
     );
   }
@@ -207,7 +221,7 @@ var SuggestionList = React.createClass({displayName: "SuggestionList",
   render: function() {
     var suggestionNodes = this.props.data.map(function (suggestion) {
       return (
-          React.createElement(Suggestion, {key: suggestion.suggestionID, annotationID: suggestion.suggestionID, creator: suggestion.userID}, 
+          React.createElement(Suggestion, {key: suggestion.suggestionID, suggestionID: suggestion.suggestionID, creator: suggestion.userID}, 
             suggestion.suggestion
           )
       );

@@ -192,12 +192,26 @@ var SuggestionsBox = React.createClass({
 });
 
 var Suggestion = React.createClass({
+  handleVote: function(event) {
+    if($(event.target).hasClass('voteUp')) {
+      var vote = true;
+    } else {
+      var vote = false;
+    }
+    $.ajax({
+      method: "PUT",
+      url: "/api/submitSuggestionVote",
+      data: { suggestionID: this.props.suggestionID, vote: vote }
+    }).done(function(data) {
+
+    })
+  },
   render: function() {
     return (
         <div>
           <p>{this.props.children}</p>
-          <div className="icon-action-black icon-action-black-ic_thumb_up_black_24dp"></div>
-          <div className="icon-action-black icon-action-black-ic_thumb_down_black_24dp"></div>
+          <div onClick={this.handleVote} className="voteUp icon-action-black icon-action-black-ic_thumb_up_black_24dp"></div>
+          <div onClick={this.handleVote} className="voteDown icon-action-black icon-action-black-ic_thumb_down_black_24dp"></div>
         </div>
     );
   }
@@ -207,7 +221,7 @@ var SuggestionList = React.createClass({
   render: function() {
     var suggestionNodes = this.props.data.map(function (suggestion) {
       return (
-          <Suggestion key={suggestion.suggestionID} annotationID={suggestion.suggestionID} creator={suggestion.userID}>
+          <Suggestion key={suggestion.suggestionID} suggestionID={suggestion.suggestionID} creator={suggestion.userID}>
             {suggestion.suggestion}
           </Suggestion>
       );
