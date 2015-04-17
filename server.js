@@ -207,7 +207,7 @@ function getSuggestedChanges(videoName, cb) {
 }
 
 app.put('/api/submitSuggestionVote', function (req, res) {
-  submitSuggestionVote(req.body.suggestionID, req.user.userID, req.body.vote, function (err, results) {
+  submitSuggestionVote(parseInt(req.body.suggestionID), req.user.userID, req.body.vote, function (err, results) {
     if(err) {
       res.writeHead(500);
       res.end(err.toString());
@@ -227,7 +227,6 @@ function submitSuggestionVote(suggestionID, userID, vote, cb) {
   pool.getConnection(function(connErr, conn) {
     var query = util.format("INSERT INTO suggestionVotes(voteID, suggestionID, userID, vote) VALUES(NULL, '%d', %d, '%d')",
         conn.escape(suggestionID), userID, vote);
-    console.log(query);
     conn.query(query, function(err, results, fields) {
       conn.release();
       cb(err, results);
@@ -383,7 +382,7 @@ passport.use('local-login', new LocalStrategy({
     }
 ));
 
-var server = app.listen(8001);
+var server = app.listen(8000);
 
 process.on('SIGTERM', function() {
   server.close(function () {
