@@ -76,14 +76,10 @@ function login(event) {
   var email = $("#emailLogin").val();
   var password = $("#passwordLogin").val();
   $.post('/login', {'email': email, 'password': password}, function(data) {
-    user = JSON.parse(data);
+    var user = JSON.parse(data);
     if(user.userID) {
       $('#loginForm').hide();
-      var welcomeHTML = '<p>Welcome ' + user.email + '</p>';
-      if(user.userType === 1) {
-        welcomeHTML += '<a href="/annotations">Add annotations</a>';
-      }
-      $("#welcome").html(welcomeHTML);
+      loginSuccess(user);
     }
   })
 }
@@ -103,8 +99,20 @@ function signUp(event) {
   var email = $("#emailSignUp").val();
   var password = $("#passwordSignUp").val();
   $.post('/signup', {'email': email, 'password': password}, function(data) {
-    console.log(data);
+    var user = JSON.parse(data);
+    if(user.userID) {
+      $('#signUpForm').hide();
+      loginSuccess(user);
+    }
   })
+}
+
+function loginSuccess(user) {
+  var welcomeHTML = '<p>Welcome ' + user.email + '</p>';
+  if(user.userType === 1) {
+    welcomeHTML += '<a href="/annotations">Add annotations</a>';
+  }
+  $("#welcome").html(welcomeHTML);
 }
 
 /*

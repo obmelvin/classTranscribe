@@ -219,7 +219,7 @@ app.post('/login', function(req, res, next) {
         return next(err);
       var clientUser = JSON.parse(JSON.stringify(user));
       clientUser.password = null;
-      res.end(JSON.stringify(user));
+      res.end(JSON.stringify(clientUser));
     });
   })(req, res, next);
 });
@@ -237,7 +237,9 @@ app.post('/signup', function(req, res, next) {
     }
     req.logIn(user, function(err) {
       if (err) { return next(err); }
-      res.redirect('/')
+      var clientUser = JSON.parse(JSON.stringify(user));
+      clientUser.password = null;
+      res.end(JSON.stringify(clientUser))
     });
   })(req, res, next);
 });
@@ -318,7 +320,7 @@ passport.use('local-login', new LocalStrategy({
     }
 ));
 
-var server = app.listen(8000);
+var server = app.listen(8001);
 
 process.on('SIGTERM', function() {
   server.close(function () {
