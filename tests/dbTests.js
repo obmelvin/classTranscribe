@@ -19,11 +19,25 @@ describe('/api/loadAnnotations', function() {
                                     video: videoName,
                                     content: 'learn more at http://linux.die.net/man/2/write' } ];
             server.loadAnnotations(videoName, function(error, results) {
-                expect(results).should.equal(annotations);
+                expect(results).to.equal(annotations);
+            })
+        })
+    })
+});
+
+describe('/api/suggestTranscriptionChanges', function() {
+    context('when submitting a change', function() {
+        it('should be added to the DB', function() {
+            var videoName = 'Mini Video: Hello World';
+            var suggestion = "so here's a virtual machine";
+            server.suggestTranscriptionChange(2, videoName, 11, suggestion, function(error, results) {
+                expect(results).to.have.property('insertId');
+                expect(results.insertID).not.to.be.null;
             })
         })
     })
 })
+
 
 
 //describe('when new comment', function() {

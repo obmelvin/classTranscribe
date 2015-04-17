@@ -170,6 +170,7 @@ function suggestTranscriptionChange(userID, video, time, suggestion, cb) {
     });
   });
 }
+exports.suggestTranscriptionChange = suggestTranscriptionChange;
 
 /*
  route handler for loading annotations
