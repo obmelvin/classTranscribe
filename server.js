@@ -147,6 +147,30 @@ function addAnnotations(userID, video, time, content, cb) {
 }
 exports.addAnnotations = addAnnotations;
 
+app.put('/api/suggestTranscriptChange', function (req, res) {
+  //console.log("suggest session" + req.session);
+  suggestTranscriptionChange(req.user.userID, req.body.video, req.body.time, req.body.suggestion, function(err, results) {
+    if(err) {
+      res.writeHead(500);
+      res.end(err.toString());
+    } else {
+      res.writeHead(204);
+      res.end();
+    }
+  })
+});
+
+function suggestTranscriptionChange(userID, video, time, suggestion, cb) {
+  pool.getConnection(function(connErr, conn) {
+    var query = util.format("INSERT INTO transcriptionSuggestions(suggestionID, userID, video, time, suggestion) VALUES(NULL, '%d', %s, '%d', %s)",
+        userID, conn.escape(video), conn.escape(parseInt(time)), conn.escape(suggestion));
+    conn.query(query, function(err, results, fields) {
+      conn.release();
+      cb(err, results);
+    });
+  });
+}
+
 /*
  route handler for loading annotations
 */
@@ -299,10 +323,10 @@ process.on('SIGTERM', function() {
   server.close(function () {
     process.exit(0);
   })
-})
+});
 
 process.on('SIGINT', function() {
   server.close(function () {
     process.exit(0);
   })
-})
+});

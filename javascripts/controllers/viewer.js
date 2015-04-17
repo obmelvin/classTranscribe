@@ -142,7 +142,14 @@ var CaptionEditBox = React.createClass({
     this.setState({value: event.target.value});
   },
   handleSubmit: function(event) {
-    
+    var video = $(".main-video").get(0);
+    $.ajax({
+      method: "PUT",
+      url: "/api/suggestTranscriptChange",
+      data: { suggestion: $('.captionEditBox > textarea').val(), time: video.currentTime, video: this.props.data.video }
+    }).done(function(data) {
+
+    });
   },
   render: function() {
     var value = this.state.value;
