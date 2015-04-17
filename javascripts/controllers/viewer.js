@@ -72,6 +72,7 @@ function loadStartTime() {
 function bindEventListeners() {
   $(".video-selector").off().change(begin);
   $(".playback-selector").off().change(changePlaybackSpeed);
+  $(".caption").click(editCaption);
 }
 
 /*
@@ -122,6 +123,37 @@ function bindAnnotations(annotations) {
   };
   return wrapper;
 }
+
+function editCaption() {
+  var videoName = $(".video-selector option:selected").text();
+  var time = this.dataset.time;
+  var caption = { video: videoName, time: time, content: this.textContent };
+  React.render(
+      <CaptionEditBox data={caption} />,
+      $('.caption-edit-container')[0]
+  );
+}
+
+var CaptionEditBox = React.createClass({
+  getInitialState: function() {
+    return {value: this.props.data.content};
+  },
+  handleChange: function(event) {
+    this.setState({value: event.target.value});
+  },
+  handleSubmit: function(event) {
+    
+  },
+  render: function() {
+    var value = this.state.value;
+    return (
+        <div time={this.props.data.time} className="captionEditBox">
+          <textarea value={value} onChange={this.handleChange}></textarea>
+          <button onClick={this.handleSubmit}>Suggest improvement</button>
+        </div>
+    )
+  }
+});
 
 /*
   Update the highlighted caption given the current time
