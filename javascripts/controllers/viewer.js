@@ -25,6 +25,7 @@ function begin() {
   loadCaptions(videoIndex);
   loadAnnotations();
   loadSuggestedChanges();
+  loadComments();
   bindEventListeners();
   changePlaybackSpeed();
 }
@@ -142,6 +143,13 @@ function editCaption() {
   );
 }
 
+function loadComments() {
+  React.render(
+      <CommentBox url="/api/getComments" />,
+      $(".comments-container")[0]
+  )
+}
+
 var CaptionEditBox = React.createClass({
   getInitialState: function() {
     return {value: this.props.data.content};
@@ -195,8 +203,10 @@ var Suggestion = React.createClass({
   handleVote: function(event) {
     if($(event.target).hasClass('voteUp')) {
       var vote = true;
+      $(event.target).removeClass('icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp').addClass('icon-action-black icon-action-black-ic_thumb_up_black_24dp');
     } else {
       var vote = false;
+      $(event.target).removeClass('icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp').addClass('icon-action-black icon-action-black-ic_thumb_down_black_24dp');
     }
     $.ajax({
       method: "PUT",
@@ -210,8 +220,8 @@ var Suggestion = React.createClass({
     return (
         <div>
           <p>{this.props.children}</p>
-          <div onClick={this.handleVote} className="voteUp icon-action-black icon-action-black-ic_thumb_up_black_24dp"></div>
-          <div onClick={this.handleVote} className="voteDown icon-action-black icon-action-black-ic_thumb_down_black_24dp"></div>
+          <div onClick={this.handleVote} className="voteUp icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp"></div>
+          <div onClick={this.handleVote} className="voteDown icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp"></div>
         </div>
     );
   }
@@ -229,6 +239,85 @@ var SuggestionList = React.createClass({
     return (
         <div className="suggestionList">
           {suggestionNodes}
+        </div>
+    );
+  }
+});
+
+var Comment = React.createClass({
+  handleVote: function(event) {
+    if($(event.target).hasClass('voteUp')) {
+      var vote = true;
+      $(event.target).removeClass('icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp').addClass('icon-action-black icon-action-black-ic_thumb_up_black_24dp');
+    } else {
+      var vote = false;
+      $(event.target).removeClass('icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp').addClass('icon-action-black icon-action-black-ic_thumb_down_black_24dp');
+    }
+    $.ajax({
+      method: "PUT",
+      url: "/api/",
+      data: { suggestionID: null, vote: vote }
+    }).done(function(data) {
+
+    })
+  },
+  render: function() {
+    return (
+        <div className="comment">
+          <p>{this.props.children}</p>
+          <div onClick={this.handleVote} className="voteUp icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp"></div>
+          <div onClick={this.handleVote} className="voteDown icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp"></div>
+        </div>
+    );
+  }
+});
+
+var CommentList = React.createClass({
+  render: function() {
+    var commentNodes = this.props.commentsData.map(function (comment) {
+      var commentStyle = {
+        margin: '0 0 0 ' + comment.depth + 'px'
+      };
+      return (
+          <Comment key={comment.commentID} commentID={comment.commentID} author={comment.userID} style=commentStyle>
+            {comment.commentText}
+          </Comment>
+      )
+    });
+    return (
+        <div className="commentList">
+          {commentNodes}
+        </div>
+    );
+  }
+});
+
+var CommentForm = React.createClass({
+  render: function() {
+    return (
+        <div className="commentForm">
+        </div>
+    );
+  }
+});
+
+var CommentBox = React.createClass({
+  getInitialState: function() {
+    return {commentsData: []};
+  },
+  componentDidMount: function() {
+    var self = this;
+    var videoName = $(".video-selector option:selected").text();
+    $.get(self.props.url, {video: videoName}, function(commentsData) {
+      self.setState({commentsData: JSON.parse(commentsData)});
+    })
+  },
+  render: function() {
+    return (
+        <div className="commentBox">
+          <h3>Comments</h3>
+          <CommentList data={this.state.commentsData} />
+          <CommentForm />
         </div>
     );
   }

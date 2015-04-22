@@ -19,10 +19,13 @@
 
 .viewer-container {
   float: left;
+  width: 600px;
 }
 
 .suggestions-container, .suggestionBox {
   float: left;
+  max-width: 400px;
+  margin-left: 5px;
 }
 
 .annotation {

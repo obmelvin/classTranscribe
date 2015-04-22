@@ -25,6 +25,7 @@ function begin() {
   loadCaptions(videoIndex);
   loadAnnotations();
   loadSuggestedChanges();
+  loadComments();
   bindEventListeners();
   changePlaybackSpeed();
 }
@@ -142,6 +143,13 @@ function editCaption() {
   );
 }
 
+function loadComments() {
+  React.render(
+      React.createElement(CommentBox, {url: "/api/getComments"}),
+      $(".comments-container")[0]
+  )
+}
+
 var CaptionEditBox = React.createClass({displayName: "CaptionEditBox",
   getInitialState: function() {
     return {value: this.props.data.content};
@@ -195,8 +203,10 @@ var Suggestion = React.createClass({displayName: "Suggestion",
   handleVote: function(event) {
     if($(event.target).hasClass('voteUp')) {
       var vote = true;
+      $(event.target).removeClass('icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp').addClass('icon-action-black icon-action-black-ic_thumb_up_black_24dp');
     } else {
       var vote = false;
+      $(event.target).removeClass('icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp').addClass('icon-action-black icon-action-black-ic_thumb_down_black_24dp');
     }
     $.ajax({
       method: "PUT",
@@ -210,8 +220,8 @@ var Suggestion = React.createClass({displayName: "Suggestion",
     return (
         React.createElement("div", null, 
           React.createElement("p", null, this.props.children), 
-          React.createElement("div", {onClick: this.handleVote, className: "voteUp icon-action-black icon-action-black-ic_thumb_up_black_24dp"}), 
-          React.createElement("div", {onClick: this.handleVote, className: "voteDown icon-action-black icon-action-black-ic_thumb_down_black_24dp"})
+          React.createElement("div", {onClick: this.handleVote, className: "voteUp icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp"}), 
+          React.createElement("div", {onClick: this.handleVote, className: "voteDown icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp"})
         )
     );
   }
@@ -229,6 +239,82 @@ var SuggestionList = React.createClass({displayName: "SuggestionList",
     return (
         React.createElement("div", {className: "suggestionList"}, 
           suggestionNodes
+        )
+    );
+  }
+});
+
+var Comment = React.createClass({displayName: "Comment",
+  handleVote: function(event) {
+    if($(event.target).hasClass('voteUp')) {
+      var vote = true;
+      $(event.target).removeClass('icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp').addClass('icon-action-black icon-action-black-ic_thumb_up_black_24dp');
+    } else {
+      var vote = false;
+      $(event.target).removeClass('icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp').addClass('icon-action-black icon-action-black-ic_thumb_down_black_24dp');
+    }
+    $.ajax({
+      method: "PUT",
+      url: "/api/",
+      data: { suggestionID: null, vote: vote }
+    }).done(function(data) {
+
+    })
+  },
+  render: function() {
+    return (
+        React.createElement("div", {className: "comment"}, 
+          React.createElement("p", null, this.props.children), 
+          React.createElement("div", {onClick: this.handleVote, className: "voteUp icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp"}), 
+          React.createElement("div", {onClick: this.handleVote, className: "voteDown icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp"})
+        )
+    );
+  }
+});
+
+var CommentList = React.createClass({displayName: "CommentList",
+  render: function() {
+    var commentNodes = this.props.commentsData.map(function (comment) {
+      return (
+          React.createElement(Comment, {key: comment.commentID, commentID: comment.commentID, author: comment.userID}, 
+            comment.commentText
+          )
+      )
+    });
+    return (
+        React.createElement("div", {className: "commentList"}, 
+          commentNodes
+        )
+    );
+  }
+});
+
+var CommentForm = React.createClass({displayName: "CommentForm",
+  render: function() {
+    return (
+        React.createElement("div", {className: "commentForm"}
+        )
+    );
+  }
+});
+
+var CommentBox = React.createClass({displayName: "CommentBox",
+  getInitialState: function() {
+    return {commentsData: []};
+  },
+  componentDidMount: function() {
+    var self = this;
+    var videoName = $(".video-selector option:selected").text();
+    $.get(self.props.url, {video: videoName}, function(commentsData) {
+      self.setState({commentsData: JSON.parse(commentsData)});
+    })
+  },
+  render: function() {
+    return (
+        React.createElement("div", {className: "commentBox"}, 
+          React.createElement("h3", null, "Comments"), 
+          React.createElement(CommentList, {data: this.state.commentsData}), 
+          React.createElement(CommentForm, null)
         )
     );
   }

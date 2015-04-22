@@ -23,6 +23,7 @@ describe('/api/loadAnnotations', function() {
             })
         })
     })
+
 });
 
 describe('/api/suggestTranscriptionChanges', function() {
@@ -36,7 +37,7 @@ describe('/api/suggestTranscriptionChanges', function() {
             })
         })
     })
-})
+});
 
 
 

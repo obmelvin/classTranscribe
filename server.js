@@ -198,7 +198,7 @@ app.get('/api/getSuggestedChanges', function (req, res) {
  */
 function getSuggestedChanges(videoName, cb) {
   pool.getConnection(function (connErr, conn) {
-    var query = util.format("SELECT * FROM transcriptionSuggestions WHERE video='%s'", videoName);
+    var query = util.format("SELECT * FROM transcriptionSuggestions WHERE video=%s", conn.escape(videoName));
     conn.query(query, function(err, results, fields) {
       conn.release();
       cb(err, results);
@@ -255,8 +255,8 @@ app.get('/api/loadAnnotations', function (req, res) {
  logic for querying DB for annotations
 */
 function loadAnnotations(videoName, cb) {
-  var query = util.format("SELECT * FROM annotations WHERE video='%s'", videoName);
   pool.getConnection(function(connErr, conn) {
+    var query = util.format("SELECT * FROM annotations WHERE video=%s", conn.escape(videoName));
     conn.query(query, function(err, results, fields) {
       conn.release();
       cb(err, results);
@@ -264,6 +264,24 @@ function loadAnnotations(videoName, cb) {
   })
 };
 exports.loadAnnotations = loadAnnotations;
+
+app.get('/api/getComments', function (req, res) {
+  loadComments(req.query.video, function (error, results) {
+    if (error) {
+      res.writeHead(500);
+      res.end(error);
+    } else {
+      res.writeHead(200, {
+        'Content-Type': 'application/json'
+      });
+      res.end(JSON.stringify(results));
+    }
+  })
+});
+
+function loadComments(videoName, cb) {
+  //var query = util.format("SELECT * FROM comments WHERE "
+}
 
 /*
  route handler for logging in
