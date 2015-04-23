@@ -117,11 +117,14 @@ function bindAnnotations(annotations) {
     for (var index = 0; index < annotations.length; index++) {
       if (this.currentTime > annotations[index].time) {
         if($(".annotation#" + annotations[index].id).length === 0) { //only want to display annotation if isn't already on page
-          $(".annotations-container").append('<div class="annotation" id="' + annotations[index].id + '">' +
-          annotations[index].content + '</div>');
+          $(".annotations-container").append('<div class="annotation" id="' + annotations[index].id + '"><p>' +
+          annotations[index].content + '</p><div class="done-icon icon-action-black icon-action-black-ic_done_black_24dp"></div></div>');
         }
       }
     }
+    $('.done-icon').click(function(event) {
+      $(this).parent().hide();
+    })
   };
   return wrapper;
 }
