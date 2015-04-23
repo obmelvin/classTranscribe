@@ -136,6 +136,9 @@ function loadSuggestedChanges() {
   )
 }
 
+/*
+ Event handler to display box for suggesting a change to the transcription
+*/
 function editCaption() {
   var videoName = $(".video-selector option:selected").text();
   var time = this.dataset.time;
@@ -146,6 +149,9 @@ function editCaption() {
   );
 }
 
+/*
+ rendering the react comment components
+*/
 function loadComments() {
   React.render(
       <CommentBox url="/api/getComments" />,
@@ -153,6 +159,9 @@ function loadComments() {
   )
 }
 
+/*
+ react component for suggesting an edit to the transcription
+*/
 var CaptionEditBox = React.createClass({
   getInitialState: function() {
     return {value: this.props.data.content};
@@ -181,6 +190,9 @@ var CaptionEditBox = React.createClass({
   }
 });
 
+/*
+ react component holding transcriptions suggestions for a user to vote on
+*/
 var SuggestionsBox = React.createClass({
   toggleSuggestions: function(event) {
     this.setState({showSuggestions: !this.state.showSuggestions})
@@ -208,6 +220,9 @@ var SuggestionsBox = React.createClass({
   }
 });
 
+/*
+ react component for an individiual suggested change to the transcription
+*/
 var Suggestion = React.createClass({
   handleVote: function(event) {
     if($(event.target).hasClass('voteUp')) {
@@ -236,6 +251,9 @@ var Suggestion = React.createClass({
   }
 });
 
+/*
+ react container holding Suggestions
+*/
 var SuggestionList = React.createClass({
   render: function() {
     var suggestionNodes = this.props.data.map(function (suggestion) {
@@ -253,6 +271,9 @@ var SuggestionList = React.createClass({
   }
 });
 
+/*
+ react comment component
+*/
 var Comment = React.createClass({
   handleVote: function(event) {
     if($(event.target).hasClass('voteUp')) {
@@ -281,6 +302,9 @@ var Comment = React.createClass({
   }
 });
 
+/*
+ react container holding comments
+*/
 var CommentList = React.createClass({
   render: function() {
     var commentNodes = this.props.data.map(function (comment) {
@@ -301,6 +325,9 @@ var CommentList = React.createClass({
   }
 });
 
+/*
+ react component for submitting a new comment
+*/
 var CommentForm = React.createClass({
   getInitialState: function() {
     return {value: ''};
@@ -331,6 +358,9 @@ var CommentForm = React.createClass({
   }
 });
 
+/*
+ main react component for holding the comments
+*/
 var CommentBox = React.createClass({
   handleCommentSubmit: function(comment) {
     $.ajax({
