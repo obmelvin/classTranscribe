@@ -274,9 +274,12 @@ var Comment = React.createClass({displayName: "Comment",
 
 var CommentList = React.createClass({displayName: "CommentList",
   render: function() {
-    var commentNodes = this.props.commentsData.map(function (comment) {
+    var commentNodes = this.props.data.map(function (comment) {
+      comment.style = {
+        margin: '0 0 0 ' + comment.depth + 'px'
+      };
       return (
-          React.createElement(Comment, {key: comment.commentID, commentID: comment.commentID, author: comment.userID}, 
+          React.createElement(Comment, {key: comment.commentID, commentID: comment.commentID, author: comment.userID, style: comment.style}, 
             comment.commentText
           )
       )
@@ -290,31 +293,66 @@ var CommentList = React.createClass({displayName: "CommentList",
 });
 
 var CommentForm = React.createClass({displayName: "CommentForm",
+  getInitialState: function() {
+    return {value: ''};
+  },
+  handleChange: function(event) {
+    this.setState({value: event.target.value});
+  },
+  handleSubmit: function(e) {
+    e.preventDefault();
+    var text = React.findDOMNode(this.refs.text).value.trim();
+    var videoName = $(".video-selector option:selected").text();
+    var parentID = 0; //TODO: change to grab real parentID
+    if (!text) {
+      return;
+    }
+    this.props.onCommentSubmit({parentID: parentID, commentText: text, video: videoName});
+    React.findDOMNode(this.refs.text).value = '';
+    return;
+  },
   render: function() {
+    var value = this.state.value;
     return (
-        React.createElement("div", {className: "commentForm"}
+        React.createElement("form", {className: "commentForm", onSubmit: this.handleSubmit}, 
+          React.createElement("textarea", {value: value, ref: "text", onChange: this.handleChange}), 
+          React.createElement("input", {type: "submit", value: "Post"})
         )
     );
   }
 });
 
 var CommentBox = React.createClass({displayName: "CommentBox",
+  handleCommentSubmit: function(comment) {
+    $.ajax({
+      url: '/api/submitComment',
+      dataType: 'json',
+      type: 'PUT',
+      data: comment,
+      success: function(data) {
+        //this.setState({data: data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error('submitComment', status, err.toString());
+      }.bind(this)
+    });
+  },
   getInitialState: function() {
-    return {commentsData: []};
+    return {data: []};
   },
   componentDidMount: function() {
     var self = this;
     var videoName = $(".video-selector option:selected").text();
-    $.get(self.props.url, {video: videoName}, function(commentsData) {
-      self.setState({commentsData: JSON.parse(commentsData)});
+    $.get(self.props.url, {video: videoName}, function(data) {
+      self.setState({data: data});
     })
   },
   render: function() {
     return (
         React.createElement("div", {className: "commentBox"}, 
           React.createElement("h3", null, "Comments"), 
-          React.createElement(CommentList, {data: this.state.commentsData}), 
-          React.createElement(CommentForm, null)
+          React.createElement(CommentList, {data: this.state.data}), 
+          React.createElement(CommentForm, {onCommentSubmit: this.handleCommentSubmit})
         )
     );
   }

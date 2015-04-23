@@ -274,12 +274,12 @@ var Comment = React.createClass({
 
 var CommentList = React.createClass({
   render: function() {
-    var commentNodes = this.props.commentsData.map(function (comment) {
-      var commentStyle = {
+    var commentNodes = this.props.data.map(function (comment) {
+      comment.style = {
         margin: '0 0 0 ' + comment.depth + 'px'
       };
       return (
-          <Comment key={comment.commentID} commentID={comment.commentID} author={comment.userID} style=commentStyle>
+          <Comment key={comment.commentID} commentID={comment.commentID} author={comment.userID} style={comment.style}>
             {comment.commentText}
           </Comment>
       )
@@ -293,31 +293,66 @@ var CommentList = React.createClass({
 });
 
 var CommentForm = React.createClass({
+  getInitialState: function() {
+    return {value: ''};
+  },
+  handleChange: function(event) {
+    this.setState({value: event.target.value});
+  },
+  handleSubmit: function(e) {
+    e.preventDefault();
+    var text = React.findDOMNode(this.refs.text).value.trim();
+    var videoName = $(".video-selector option:selected").text();
+    var parentID = 0; //TODO: change to grab real parentID
+    if (!text) {
+      return;
+    }
+    this.props.onCommentSubmit({parentID: parentID, commentText: text, video: videoName});
+    React.findDOMNode(this.refs.text).value = '';
+    return;
+  },
   render: function() {
+    var value = this.state.value;
     return (
-        <div className="commentForm">
-        </div>
+        <form className="commentForm" onSubmit={this.handleSubmit}>
+          <textarea value={value} ref="text" onChange={this.handleChange} />
+          <input type="submit" value="Post" />
+        </form>
     );
   }
 });
 
 var CommentBox = React.createClass({
+  handleCommentSubmit: function(comment) {
+    $.ajax({
+      url: '/api/submitComment',
+      dataType: 'json',
+      type: 'PUT',
+      data: comment,
+      success: function(data) {
+        //this.setState({data: data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error('submitComment', status, err.toString());
+      }.bind(this)
+    });
+  },
   getInitialState: function() {
-    return {commentsData: []};
+    return {data: []};
   },
   componentDidMount: function() {
     var self = this;
     var videoName = $(".video-selector option:selected").text();
-    $.get(self.props.url, {video: videoName}, function(commentsData) {
-      self.setState({commentsData: JSON.parse(commentsData)});
+    $.get(self.props.url, {video: videoName}, function(data) {
+      self.setState({data: data});
     })
   },
   render: function() {
     return (
         <div className="commentBox">
           <h3>Comments</h3>
-          <CommentList data={this.state.commentsData} />
-          <CommentForm />
+          <CommentList data={this.state.data} />
+          <CommentForm onCommentSubmit={this.handleCommentSubmit} />
         </div>
     );
   }

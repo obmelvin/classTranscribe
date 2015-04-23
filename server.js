@@ -11,6 +11,8 @@ var SessionStore = require('express-mysql-session')
 var LocalStrategy = require('passport-local').Strategy;
 var bcrypt = require('bcrypt-nodejs');
 var mysql = require('mysql');
+var mongoose = require('mongoose');
+var autoIncrement = require('mongoose-auto-increment');
 
 var dbConfig = require('./db.js');
 
@@ -33,6 +35,23 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 var pool = mysql.createPool(dbConfig.config);
+var mongoConnection = mongoose.createConnection(dbConfig.mongoURI, dbConfig.mongoConfig);
+autoIncrement.initialize(mongoConnection);
+mongoose.set('debug, true');
+// Logging connection:
+mongoConnection.on('error', console.error.bind(console, 'DB connection error.')).once('open', console.log.bind(console, 'DB Connection established.'));
+
+var commentSchema = new mongoose.Schema({
+  authorID  : Number,
+  commentID : Number,
+  parentID  : Number,
+  video     : String,
+  body      : String
+});
+
+commentSchema.plugin(autoIncrement.plugin, { model: 'Comment', field: 'commentID' });
+
+var Comment = mongoConnection.model('Comment', commentSchema);
 
 //var indexHTML = fs.readFileSync('search.html').toString();
 app.get('/', function (req, res) {
@@ -281,6 +300,48 @@ app.get('/api/getComments', function (req, res) {
 
 function loadComments(videoName, cb) {
   //var query = util.format("SELECT * FROM comments WHERE "
+  var fakeData = [
+    {depth: 0, commentID: 1, userID: 2, commentText: 'hardcoded comment data'},
+    {depth: 1, commentID: 2, userID: 2, commentText: 'more hardcoded comment data'}
+  ];
+  cb(null, fakeData);
+}
+
+app.put('/api/submitComment', function (req, res) {
+  submitComment(req.body.parentID, req.user.userID, req.body.video, req.body.commentText, function (error, results) {
+    if(error) {
+      res.writeHead(500);
+      res.end(error.toString());
+    } else {
+      res.writeHead(204);
+      res.end();
+    }
+  })
+});
+
+function submitComment(parentID, author, video, body, cb) {
+
+  Comment.nextCount(function(err, count) {
+    if (err) {
+      console.error(err);
+    }
+    console.log(count);
+    var comment = new Comment({
+      authorID  : author,
+      commentID : count,
+      parentID  : parentID,
+      video     : video,
+      body      : body
+    });
+    comment.save(function(err, result) {
+      if (err) {
+        console.error(err);
+      }
+      console.log(result);
+      cb(err, result);
+    });
+  });
+
 }
 
 /*
