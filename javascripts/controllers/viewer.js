@@ -182,8 +182,11 @@ var CaptionEditBox = React.createClass({
 });
 
 var SuggestionsBox = React.createClass({
+  toggleSuggestions: function(event) {
+    this.setState({showSuggestions: !this.state.showSuggestions})
+  },
   getInitialState: function() {
-    return {data: []};
+    return {data: [], showSuggestions: false};
   },
   componentDidMount: function() {
     var self = this;
@@ -195,8 +198,11 @@ var SuggestionsBox = React.createClass({
   render: function() {
     return (
       <div className="suggestionBox">
-        <h3>Suggested Transcription Changes</h3>
-        <SuggestionList data={this.state.data} />
+        <button className="toggleSuggestionsButton" onClick={this.toggleSuggestions}>{this.state.showSuggestions ? 'Hide' : 'Show'} Suggestions</button>
+        <div className={this.state.showSuggestions ? '' : 'hidden'}>
+          <h3>Suggested Transcription Changes</h3>
+          <SuggestionList data={this.state.data} />
+        </div>
       </div>
     );
   }

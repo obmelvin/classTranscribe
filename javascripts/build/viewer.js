@@ -182,8 +182,11 @@ var CaptionEditBox = React.createClass({displayName: "CaptionEditBox",
 });
 
 var SuggestionsBox = React.createClass({displayName: "SuggestionsBox",
+  toggleSuggestions: function(event) {
+    this.setState({showSuggestions: !this.state.showSuggestions})
+  },
   getInitialState: function() {
-    return {data: []};
+    return {data: [], showSuggestions: false};
   },
   componentDidMount: function() {
     var self = this;
@@ -195,8 +198,11 @@ var SuggestionsBox = React.createClass({displayName: "SuggestionsBox",
   render: function() {
     return (
       React.createElement("div", {className: "suggestionBox"}, 
-        React.createElement("h3", null, "Suggested Transcription Changes"), 
-        React.createElement(SuggestionList, {data: this.state.data})
+        React.createElement("button", {className: "toggleSuggestionsButton", onClick: this.toggleSuggestions}, this.state.showSuggestions ? 'Hide' : 'Show', " Suggestions"), 
+        React.createElement("div", {className: this.state.showSuggestions ? '' : 'hidden'}, 
+          React.createElement("h3", null, "Suggested Transcription Changes"), 
+          React.createElement(SuggestionList, {data: this.state.data})
+        )
       )
     );
   }
