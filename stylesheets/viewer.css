@@ -26,6 +26,7 @@
   float: left;
   max-width: 400px;
   margin-left: 5px;
+
 }
 
 .comments-container {
@@ -70,6 +71,7 @@
 
 .toggleSuggestionsButton {
   margin-bottom: 10px;
+  margin-top: 15px;
 }
 
 h1 {

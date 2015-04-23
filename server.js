@@ -154,6 +154,9 @@ app.put('/api/addAnnotation', function (req, res) {
   }
 });
 
+/*
+ query logic for adding an annotation to the database
+ */
 function addAnnotations(userID, video, time, content, cb) {
   pool.getConnection(function(connErr, conn) {
     var query = util.format("INSERT INTO annotations(id, userID, video, time, content) VALUES(NULL, '%d', %s, '%d', %s)",
@@ -168,7 +171,7 @@ exports.addAnnotations = addAnnotations;
 
 /*
  route handler for suggesting a change to a transcription
- */
+*/
 app.put('/api/suggestTranscriptChange', function (req, res) {
   //console.log("suggest session" + req.session);
   suggestTranscriptionChange(req.user.userID, req.body.video, req.body.time, req.body.suggestion, function(err, results) {
@@ -184,7 +187,7 @@ app.put('/api/suggestTranscriptChange', function (req, res) {
 
 /*
  DB logic for adding a suggested transcription change
- */
+*/
 function suggestTranscriptionChange(userID, video, time, suggestion, cb) {
   pool.getConnection(function(connErr, conn) {
     var query = util.format("INSERT INTO transcriptionSuggestions(suggestionID, userID, video, time, suggestion) VALUES(NULL, '%d', %s, '%d', %s)",
@@ -199,7 +202,7 @@ exports.suggestTranscriptionChange = suggestTranscriptionChange;
 
 /*
  route handler for getting all suggested changes for a video
- */
+*/
 app.get('/api/getSuggestedChanges', function (req, res) {
   getSuggestedChanges(req.query.video, function(err, results) {
     if(err) {
@@ -214,7 +217,7 @@ app.get('/api/getSuggestedChanges', function (req, res) {
 
 /*
  DB logic for getting all suggested changes for a particular video
- */
+*/
 function getSuggestedChanges(videoName, cb) {
   pool.getConnection(function (connErr, conn) {
     var query = util.format("SELECT * FROM transcriptionSuggestions WHERE video=%s", conn.escape(videoName));
@@ -225,6 +228,9 @@ function getSuggestedChanges(videoName, cb) {
   })
 }
 
+/*
+ route handler for voting on a suggested change to a transcription
+*/
 app.put('/api/submitSuggestionVote', function (req, res) {
   submitSuggestionVote(parseInt(req.body.suggestionID), req.user.userID, req.body.vote, function (err, results) {
     if(err) {
@@ -237,6 +243,9 @@ app.put('/api/submitSuggestionVote', function (req, res) {
   })
 });
 
+/*
+ DB logic for storing a vote on a suggested change to a transcription
+*/
 function submitSuggestionVote(suggestionID, userID, vote, cb) {
   if(vote) {
     vote = 1;
@@ -284,6 +293,9 @@ function loadAnnotations(videoName, cb) {
 };
 exports.loadAnnotations = loadAnnotations;
 
+/*
+ route handler getting all comments for a video
+*/
 app.get('/api/getComments', function (req, res) {
   loadComments(req.query.video, function (error, results) {
     if (error) {
@@ -298,6 +310,9 @@ app.get('/api/getComments', function (req, res) {
   })
 });
 
+/*
+ DB logic for getting all comments for a video
+*/
 function loadComments(videoName, cb) {
   Comment.find({video: videoName, parentID: 0}, function(err, topComments) {
     topComments.forEach(function(current, index, array) {
@@ -310,7 +325,11 @@ function loadComments(videoName, cb) {
     {depth: 1, commentID: 2, userID: 2, commentText: 'more hardcoded comment data'}
   ];
 }
+exports.loadComments = loadComments;
 
+/*
+ helper query to recursively build comment tree
+*/
 function getCommentChildren(comment, depth) {
   var videoName = comment.video;
   var parentID = comment.commentID;
@@ -324,6 +343,9 @@ function getCommentChildren(comment, depth) {
   });
 }
 
+/*
+ route handler for submitting a comment on a video
+*/
 app.put('/api/submitComment', function (req, res) {
   submitComment(req.body.parentID, req.user.userID, req.body.video, req.body.commentText, function (error, results) {
     if(error) {
@@ -336,8 +358,10 @@ app.put('/api/submitComment', function (req, res) {
   })
 });
 
+/*
+ DB logic for submitting a comment on a video
+ */
 function submitComment(parentID, author, video, body, cb) {
-
   Comment.nextCount(function(err, count) {
     if (err) {
       console.error(err);
@@ -478,6 +502,9 @@ passport.use('local-login', new LocalStrategy({
 
 var server = app.listen(8000);
 
+/*
+ signal handlers to gracefully shutdown server
+*/
 process.on('SIGTERM', function() {
   server.close(function () {
     process.exit(0);
