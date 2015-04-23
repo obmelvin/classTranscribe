@@ -28,11 +28,27 @@
   margin-left: 5px;
 }
 
+.comments-container {
+  float: left;
+  margin-left: 5px;
+  margin-top: 5px;
+}
+
 .annotation {
   margin: 10px 0;
   border: 1px solid black;
   padding: 2px 2px;
   width: inherit;
+}
+
+.suggestion {
+  border: 1px solid black;
+  padding: 2px 2px;
+}
+
+.comment {
+  border: 1px solid black;
+  padding: 2px 2px;
 }
 
 h1 {

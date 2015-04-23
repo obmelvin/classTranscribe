@@ -299,12 +299,29 @@ app.get('/api/getComments', function (req, res) {
 });
 
 function loadComments(videoName, cb) {
-  //var query = util.format("SELECT * FROM comments WHERE "
+  Comment.find({video: videoName, parentID: 0}, function(err, topComments) {
+    topComments.forEach(function(current, index, array) {
+      getCommentChildren(current, 0);
+    });
+    cb(err, topComments);
+  });
   var fakeData = [
     {depth: 0, commentID: 1, userID: 2, commentText: 'hardcoded comment data'},
     {depth: 1, commentID: 2, userID: 2, commentText: 'more hardcoded comment data'}
   ];
-  cb(null, fakeData);
+}
+
+function getCommentChildren(comment, depth) {
+  var videoName = comment.video;
+  var parentID = comment.commentID;
+  Comment.find({video: videoName, parentID: parentID}, function(err, childComments) {
+    if(childComments != null) {
+      comment.childComments = childComments;
+      childComments.forEach(function(current) {
+        getCommentChildren(current, depth+1);
+      })
+    }
+  });
 }
 
 app.put('/api/submitComment', function (req, res) {
@@ -325,7 +342,6 @@ function submitComment(parentID, author, video, body, cb) {
     if (err) {
       console.error(err);
     }
-    console.log(count);
     var comment = new Comment({
       authorID  : author,
       commentID : count,
@@ -337,7 +353,6 @@ function submitComment(parentID, author, video, body, cb) {
       if (err) {
         console.error(err);
       }
-      console.log(result);
       cb(err, result);
     });
   });

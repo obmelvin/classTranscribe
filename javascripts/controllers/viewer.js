@@ -218,7 +218,7 @@ var Suggestion = React.createClass({
   },
   render: function() {
     return (
-        <div>
+        <div className="suggestion">
           <p>{this.props.children}</p>
           <div onClick={this.handleVote} className="voteUp icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp"></div>
           <div onClick={this.handleVote} className="voteDown icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp"></div>
@@ -280,7 +280,7 @@ var CommentList = React.createClass({
       };
       return (
           <Comment key={comment.commentID} commentID={comment.commentID} author={comment.userID} style={comment.style}>
-            {comment.commentText}
+            {comment.body}
           </Comment>
       )
     });
@@ -308,7 +308,7 @@ var CommentForm = React.createClass({
       return;
     }
     this.props.onCommentSubmit({parentID: parentID, commentText: text, video: videoName});
-    React.findDOMNode(this.refs.text).value = '';
+    this.setState({value: ''});
     return;
   },
   render: function() {
@@ -330,6 +330,7 @@ var CommentBox = React.createClass({
       type: 'PUT',
       data: comment,
       success: function(data) {
+        this.getCommentData();
         //this.setState({data: data});
       }.bind(this),
       error: function(xhr, status, err) {
@@ -337,15 +338,18 @@ var CommentBox = React.createClass({
       }.bind(this)
     });
   },
-  getInitialState: function() {
-    return {data: []};
-  },
-  componentDidMount: function() {
+  getCommentData: function() {
     var self = this;
     var videoName = $(".video-selector option:selected").text();
     $.get(self.props.url, {video: videoName}, function(data) {
       self.setState({data: data});
     })
+  },
+  getInitialState: function() {
+    return {data: []};
+  },
+  componentDidMount: function() {
+    this.getCommentData();
   },
   render: function() {
     return (
