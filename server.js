@@ -20,7 +20,7 @@ var app = express();
 var sessionStore = new SessionStore(dbConfig.sessionStoreConfig);
 var sessionSecret = '123sup3rs3cret'; //TODO: change to be actually secure
 
-//app.enable('trust proxy'); //this is necessary when using gulp as a proxy to enable livereload
+app.enable('trust proxy'); //this is necessary when using gulp as a proxy to enable livereload
 //important to set static path before enabling sessions. otherwise initial requests for static resources will all
 //try to start their own session
 app.use(express.static(path.join(__dirname, 'public')));

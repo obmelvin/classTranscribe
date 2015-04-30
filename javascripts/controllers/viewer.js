@@ -361,7 +361,11 @@ var CommentForm = React.createClass({
     var value = this.state.value;
     return (
         <form className="commentForm" onSubmit={this.handleSubmit}>
-          <textarea value={value} ref="text" onChange={this.handleChange} />
+          <div className="input-field">
+            <textarea id="newCommentArea" className="materialize-textarea" value={value} ref="text" onChange={this.handleChange} />
+            <label for="newCommentArea">Add a Comment</label>
+          </div>
+
           <button className="btn waves-effect waves-light commentSubmitButton" type="submit" name="action">Post
             <i className="mdi-content-send right"></i>
           </button>
