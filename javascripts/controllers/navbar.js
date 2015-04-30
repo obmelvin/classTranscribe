@@ -1,9 +1,11 @@
 
 var NavBar = React.createClass({
-    //getInitialState: function() {
-    //    return {value: this.props.data.content};
-    //},
+    getInitialState: function() {
+        var url = window.location.href;
+        return {isSearchPage: url.charAt(url.length-1) === '/'};
+    },
     render: function() {
+        var searchBarClasses = 'right hide-on-med-and-down';
         return (
             <nav>
                 <div className="nav-wrapper indigo darken-4 grey-text text-lighten-3">
@@ -13,7 +15,7 @@ var NavBar = React.createClass({
                         <li><a className="grey-text text-lighten-3" href="components.html">First</a></li>
                         <li><a className="grey-text text-lighten-3" href="javascript.html">JavaScript</a></li>
                     </ul>
-                    <ul className="right hide-on-med-and-down">
+                    <ul className={this.state.isSearchPage ? searchBarClasses : (searchBarClasses + ' hidden')}>
                         <li>
                             <form>
                                 <div className="input-field grey-text text-lighten-3">
