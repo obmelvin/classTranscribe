@@ -136,6 +136,9 @@ function loadSuggestedChanges() {
   )
 }
 
+/*
+ Event handler to display box for suggesting a change to the transcription
+*/
 function editCaption() {
   var videoName = $(".video-selector option:selected").text();
   var time = this.dataset.time;
@@ -146,6 +149,9 @@ function editCaption() {
   );
 }
 
+/*
+ rendering the react comment components
+*/
 function loadComments() {
   React.render(
       React.createElement(CommentBox, {url: "/api/getComments"}),
@@ -153,6 +159,9 @@ function loadComments() {
   )
 }
 
+/*
+ react component for suggesting an edit to the transcription
+*/
 var CaptionEditBox = React.createClass({displayName: "CaptionEditBox",
   getInitialState: function() {
     return {value: this.props.data.content};
@@ -181,6 +190,9 @@ var CaptionEditBox = React.createClass({displayName: "CaptionEditBox",
   }
 });
 
+/*
+ react component holding transcriptions suggestions for a user to vote on
+*/
 var SuggestionsBox = React.createClass({displayName: "SuggestionsBox",
   toggleSuggestions: function(event) {
     this.setState({showSuggestions: !this.state.showSuggestions})
@@ -198,9 +210,9 @@ var SuggestionsBox = React.createClass({displayName: "SuggestionsBox",
   render: function() {
     return (
       React.createElement("div", {className: "suggestionBox"}, 
-        React.createElement("button", {className: "toggleSuggestionsButton", onClick: this.toggleSuggestions}, this.state.showSuggestions ? 'Hide' : 'Show', " Suggestions"), 
+        React.createElement("a", {className: "toggleSuggestionsButton btn-large waves-effect waves-light blue darken-4", onClick: this.toggleSuggestions}, this.state.showSuggestions ? 'Hide' : 'Show', " Suggestions"), 
         React.createElement("div", {className: this.state.showSuggestions ? '' : 'hidden'}, 
-          React.createElement("h3", null, "Suggested Transcription Changes"), 
+          React.createElement("h5", null, "Suggested Transcription Changes"), 
           React.createElement(SuggestionList, {data: this.state.data})
         )
       )
@@ -208,14 +220,17 @@ var SuggestionsBox = React.createClass({displayName: "SuggestionsBox",
   }
 });
 
+/*
+ react component for an individiual suggested change to the transcription
+*/
 var Suggestion = React.createClass({displayName: "Suggestion",
   handleVote: function(event) {
     if($(event.target).hasClass('voteUp')) {
       var vote = true;
-      $(event.target).removeClass('icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp').addClass('icon-action-black icon-action-black-ic_thumb_up_black_24dp');
+      $(event.target).removeClass('icon-action-white icon-action-white-ic_thumb_up_white_24dp').addClass('icon-action-black icon-action-black-ic_thumb_up_black_24dp');
     } else {
       var vote = false;
-      $(event.target).removeClass('icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp').addClass('icon-action-black icon-action-black-ic_thumb_down_black_24dp');
+      $(event.target).removeClass('icon-action-white icon-action-white-ic_thumb_down_white_24dp').addClass('icon-action-black icon-action-black-ic_thumb_down_black_24dp');
     }
     $.ajax({
       method: "PUT",
@@ -227,15 +242,23 @@ var Suggestion = React.createClass({displayName: "Suggestion",
   },
   render: function() {
     return (
-        React.createElement("div", {className: "suggestion"}, 
-          React.createElement("p", null, this.props.children), 
-          React.createElement("div", {onClick: this.handleVote, className: "voteUp icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp"}), 
-          React.createElement("div", {onClick: this.handleVote, className: "voteDown icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp"})
+        React.createElement("div", {className: "suggestion card indigo accent-3"}, 
+          React.createElement("div", {className: "card-content"}, 
+            React.createElement("p", null, this.props.children)
+          ), 
+          React.createElement("div", {className: "card-action"}, 
+            React.createElement("div", {onClick: this.handleVote, className: "voteUp icon-action-white icon-action-white-ic_thumb_up_white_24dp"}), 
+            React.createElement("div", {onClick: this.handleVote, className: "voteDown icon-action-white icon-action-white-ic_thumb_down_white_24dp"})
+          )
+
         )
     );
   }
 });
 
+/*
+ react container holding Suggestions
+*/
 var SuggestionList = React.createClass({displayName: "SuggestionList",
   render: function() {
     var suggestionNodes = this.props.data.map(function (suggestion) {
@@ -253,14 +276,17 @@ var SuggestionList = React.createClass({displayName: "SuggestionList",
   }
 });
 
+/*
+ react comment component
+*/
 var Comment = React.createClass({displayName: "Comment",
   handleVote: function(event) {
     if($(event.target).hasClass('voteUp')) {
       var vote = true;
-      $(event.target).removeClass('icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp').addClass('icon-action-black icon-action-black-ic_thumb_up_black_24dp');
+      $(event.target).removeClass('icon-action-white icon-action-white-ic_thumb_up_white_24dp').addClass('icon-action-black icon-action-black-ic_thumb_up_black_24dp');
     } else {
       var vote = false;
-      $(event.target).removeClass('icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp').addClass('icon-action-black icon-action-black-ic_thumb_down_black_24dp');
+      $(event.target).removeClass('icon-action-white icon-action-white-ic_thumb_down_white_24dp').addClass('icon-action-black icon-action-black-ic_thumb_down_black_24dp');
     }
     $.ajax({
       method: "PUT",
@@ -272,15 +298,23 @@ var Comment = React.createClass({displayName: "Comment",
   },
   render: function() {
     return (
-        React.createElement("div", {className: "comment"}, 
-          React.createElement("p", null, this.props.children), 
-          React.createElement("div", {onClick: this.handleVote, className: "voteUp icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp"}), 
-          React.createElement("div", {onClick: this.handleVote, className: "voteDown icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp"})
+        React.createElement("div", {className: "comment card blue-grey lighten-2"}, 
+          React.createElement("div", {className: "card-content"}, 
+            React.createElement("span", {className: "card-title white-text"}, this.props.author), 
+            React.createElement("p", null, this.props.children)
+          ), 
+          React.createElement("div", {className: "card-action"}, 
+            React.createElement("div", {onClick: this.handleVote, className: "voteUp icon-action-white icon-action-white-ic_thumb_up_white_24dp"}), 
+            React.createElement("div", {onClick: this.handleVote, className: "voteDown icon-action-white icon-action-white-ic_thumb_down_white_24dp"})
+          )
         )
     );
   }
 });
 
+/*
+ react container holding comments
+*/
 var CommentList = React.createClass({displayName: "CommentList",
   render: function() {
     var commentNodes = this.props.data.map(function (comment) {
@@ -288,7 +322,7 @@ var CommentList = React.createClass({displayName: "CommentList",
         margin: '0 0 0 ' + comment.depth + 'px'
       };
       return (
-          React.createElement(Comment, {key: comment.commentID, commentID: comment.commentID, author: comment.userID, style: comment.style}, 
+          React.createElement(Comment, {key: comment.commentID, commentID: comment.commentID, author: comment.authorID, style: comment.style}, 
             comment.body
           )
       )
@@ -301,6 +335,9 @@ var CommentList = React.createClass({displayName: "CommentList",
   }
 });
 
+/*
+ react component for submitting a new comment
+*/
 var CommentForm = React.createClass({displayName: "CommentForm",
   getInitialState: function() {
     return {value: ''};
@@ -325,13 +362,21 @@ var CommentForm = React.createClass({displayName: "CommentForm",
     return (
         React.createElement("form", {className: "commentForm", onSubmit: this.handleSubmit}, 
           React.createElement("textarea", {value: value, ref: "text", onChange: this.handleChange}), 
-          React.createElement("input", {type: "submit", value: "Post"})
+          React.createElement("button", {className: "btn waves-effect waves-light commentSubmitButton", type: "submit", name: "action"}, "Post", 
+            React.createElement("i", {className: "mdi-content-send right"})
+          )
         )
     );
   }
 });
 
+/*
+ main react component for holding the comments
+*/
 var CommentBox = React.createClass({displayName: "CommentBox",
+  toggleComments: function(event) {
+    this.setState({showComments: !this.state.showComments})
+  },
   handleCommentSubmit: function(comment) {
     $.ajax({
       url: '/api/submitComment',
@@ -355,7 +400,7 @@ var CommentBox = React.createClass({displayName: "CommentBox",
     })
   },
   getInitialState: function() {
-    return {data: []};
+    return {data: [], showComments: false};
   },
   componentDidMount: function() {
     this.getCommentData();
@@ -363,9 +408,12 @@ var CommentBox = React.createClass({displayName: "CommentBox",
   render: function() {
     return (
         React.createElement("div", {className: "commentBox"}, 
-          React.createElement("h3", null, "Comments"), 
-          React.createElement(CommentList, {data: this.state.data}), 
-          React.createElement(CommentForm, {onCommentSubmit: this.handleCommentSubmit})
+          React.createElement("a", {className: "toggleSuggestionsButton btn-large waves-effect waves-light blue darken-4", onClick: this.toggleComments}, this.state.showComments ? 'Hide' : 'Show', " Comments"), 
+          React.createElement("div", {className: this.state.showComments ? '' : 'hidden'}, 
+            React.createElement("h5", null, "Comments"), 
+            React.createElement(CommentList, {data: this.state.data}), 
+            React.createElement(CommentForm, {onCommentSubmit: this.handleCommentSubmit})
+          )
         )
     );
   }

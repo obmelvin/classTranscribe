@@ -210,9 +210,9 @@ var SuggestionsBox = React.createClass({
   render: function() {
     return (
       <div className="suggestionBox">
-        <button className="toggleSuggestionsButton" onClick={this.toggleSuggestions}>{this.state.showSuggestions ? 'Hide' : 'Show'} Suggestions</button>
+        <a className="toggleSuggestionsButton btn-large waves-effect waves-light blue darken-4" onClick={this.toggleSuggestions}>{this.state.showSuggestions ? 'Hide' : 'Show'} Suggestions</a>
         <div className={this.state.showSuggestions ? '' : 'hidden'}>
-          <h3>Suggested Transcription Changes</h3>
+          <h5>Suggested Transcription Changes</h5>
           <SuggestionList data={this.state.data} />
         </div>
       </div>
@@ -227,10 +227,10 @@ var Suggestion = React.createClass({
   handleVote: function(event) {
     if($(event.target).hasClass('voteUp')) {
       var vote = true;
-      $(event.target).removeClass('icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp').addClass('icon-action-black icon-action-black-ic_thumb_up_black_24dp');
+      $(event.target).removeClass('icon-action-white icon-action-white-ic_thumb_up_white_24dp').addClass('icon-action-black icon-action-black-ic_thumb_up_black_24dp');
     } else {
       var vote = false;
-      $(event.target).removeClass('icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp').addClass('icon-action-black icon-action-black-ic_thumb_down_black_24dp');
+      $(event.target).removeClass('icon-action-white icon-action-white-ic_thumb_down_white_24dp').addClass('icon-action-black icon-action-black-ic_thumb_down_black_24dp');
     }
     $.ajax({
       method: "PUT",
@@ -242,10 +242,15 @@ var Suggestion = React.createClass({
   },
   render: function() {
     return (
-        <div className="suggestion">
-          <p>{this.props.children}</p>
-          <div onClick={this.handleVote} className="voteUp icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp"></div>
-          <div onClick={this.handleVote} className="voteDown icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp"></div>
+        <div className="suggestion card indigo accent-3">
+          <div className="card-content">
+            <p>{this.props.children}</p>
+          </div>
+          <div className="card-action">
+            <div onClick={this.handleVote} className="voteUp icon-action-white icon-action-white-ic_thumb_up_white_24dp"></div>
+            <div onClick={this.handleVote} className="voteDown icon-action-white icon-action-white-ic_thumb_down_white_24dp"></div>
+          </div>
+
         </div>
     );
   }
@@ -278,10 +283,10 @@ var Comment = React.createClass({
   handleVote: function(event) {
     if($(event.target).hasClass('voteUp')) {
       var vote = true;
-      $(event.target).removeClass('icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp').addClass('icon-action-black icon-action-black-ic_thumb_up_black_24dp');
+      $(event.target).removeClass('icon-action-white icon-action-white-ic_thumb_up_white_24dp').addClass('icon-action-black icon-action-black-ic_thumb_up_black_24dp');
     } else {
       var vote = false;
-      $(event.target).removeClass('icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp').addClass('icon-action-black icon-action-black-ic_thumb_down_black_24dp');
+      $(event.target).removeClass('icon-action-white icon-action-white-ic_thumb_down_white_24dp').addClass('icon-action-black icon-action-black-ic_thumb_down_black_24dp');
     }
     $.ajax({
       method: "PUT",
@@ -293,10 +298,15 @@ var Comment = React.createClass({
   },
   render: function() {
     return (
-        <div className="comment">
-          <p>{this.props.children}</p>
-          <div onClick={this.handleVote} className="voteUp icon-action-grey600 icon-action-grey600-ic_thumb_up_grey600_24dp"></div>
-          <div onClick={this.handleVote} className="voteDown icon-action-grey600 icon-action-grey600-ic_thumb_down_grey600_24dp"></div>
+        <div className="comment card blue-grey lighten-2">
+          <div className="card-content">
+            <span className="card-title white-text">{this.props.author}</span>
+            <p>{this.props.children}</p>
+          </div>
+          <div className="card-action">
+            <div onClick={this.handleVote} className="voteUp icon-action-white icon-action-white-ic_thumb_up_white_24dp"></div>
+            <div onClick={this.handleVote} className="voteDown icon-action-white icon-action-white-ic_thumb_down_white_24dp"></div>
+          </div>
         </div>
     );
   }
@@ -312,7 +322,7 @@ var CommentList = React.createClass({
         margin: '0 0 0 ' + comment.depth + 'px'
       };
       return (
-          <Comment key={comment.commentID} commentID={comment.commentID} author={comment.userID} style={comment.style}>
+          <Comment key={comment.commentID} commentID={comment.commentID} author={comment.authorID} style={comment.style}>
             {comment.body}
           </Comment>
       )
@@ -352,7 +362,9 @@ var CommentForm = React.createClass({
     return (
         <form className="commentForm" onSubmit={this.handleSubmit}>
           <textarea value={value} ref="text" onChange={this.handleChange} />
-          <input type="submit" value="Post" />
+          <button className="btn waves-effect waves-light commentSubmitButton" type="submit" name="action">Post
+            <i className="mdi-content-send right"></i>
+          </button>
         </form>
     );
   }
@@ -362,6 +374,9 @@ var CommentForm = React.createClass({
  main react component for holding the comments
 */
 var CommentBox = React.createClass({
+  toggleComments: function(event) {
+    this.setState({showComments: !this.state.showComments})
+  },
   handleCommentSubmit: function(comment) {
     $.ajax({
       url: '/api/submitComment',
@@ -385,7 +400,7 @@ var CommentBox = React.createClass({
     })
   },
   getInitialState: function() {
-    return {data: []};
+    return {data: [], showComments: false};
   },
   componentDidMount: function() {
     this.getCommentData();
@@ -393,9 +408,12 @@ var CommentBox = React.createClass({
   render: function() {
     return (
         <div className="commentBox">
-          <h3>Comments</h3>
-          <CommentList data={this.state.data} />
-          <CommentForm onCommentSubmit={this.handleCommentSubmit} />
+          <a className="toggleSuggestionsButton btn-large waves-effect waves-light blue darken-4" onClick={this.toggleComments}>{this.state.showComments ? 'Hide' : 'Show'} Comments</a>
+          <div className={this.state.showComments ? '' : 'hidden'}>
+            <h5>Comments</h5>
+            <CommentList data={this.state.data} />
+            <CommentForm onCommentSubmit={this.handleCommentSubmit} />
+          </div>
         </div>
     );
   }
