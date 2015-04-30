@@ -183,8 +183,13 @@ var CaptionEditBox = React.createClass({displayName: "CaptionEditBox",
     var value = this.state.value;
     return (
         React.createElement("div", {time: this.props.data.time, className: "captionEditBox"}, 
-          React.createElement("textarea", {value: value, onChange: this.handleChange}), 
-          React.createElement("button", {onClick: this.handleSubmit}, "Suggest improvement")
+          React.createElement("div", {className: "input-field"}, 
+            React.createElement("textarea", {id: "suggestedChangeTextArea", className: "materialize-textarea", value: value, onChange: this.handleChange}), 
+            React.createElement("label", {id: "suggestedChangeLabel", htmlFor: "suggestedChangeTextArea"}, "Suggest a Change to the Transcription")
+          ), 
+          React.createElement("button", {className: "btn waves-effect waves-light commentSubmitButton", type: "submit", name: "action", onClick: this.handleSubmit}, "Suggest improvement", 
+            React.createElement("i", {className: "mdi-content-send right"})
+          )
         )
     )
   }
@@ -363,7 +368,7 @@ var CommentForm = React.createClass({displayName: "CommentForm",
         React.createElement("form", {className: "commentForm", onSubmit: this.handleSubmit}, 
           React.createElement("div", {className: "input-field"}, 
             React.createElement("textarea", {id: "newCommentArea", className: "materialize-textarea", value: value, ref: "text", onChange: this.handleChange}), 
-            React.createElement("label", {for: "newCommentArea"}, "Add a Comment")
+            React.createElement("label", {htmlFor: "newCommentArea"}, "Add a Comment")
           ), 
 
           React.createElement("button", {className: "btn waves-effect waves-light commentSubmitButton", type: "submit", name: "action"}, "Post", 

@@ -21,10 +21,11 @@
     <!-- End Stylesheets -->
   </head>
   <body>
+  <header>
+    <div class="nav-bar-container"></div>
+  </header>
+  <main>
     <div class="main-container">
-      <div class="header-container">
-        <h1>Class Transcribe</h1>
-      </div>
       <div class="viewer-container">
         <div class="video-container">
           <video class="main-video" width="600" controls>
@@ -42,9 +43,14 @@
         <div class="caption-edit-container"></div>
         <div class="comments-container"></div>
       </div>
+      <div class="suggestions-container"></div>
     </div>
-    <div class="suggestions-container"></div>
-
-    <script src="/javascripts/build/viewer.js"></script>
+  </main>
+  <footer class="footer-container"></footer>
+  <script src="/javascripts/build/viewer.js"></script>
+  <script src="/javascripts/build/navbar.js"></script>
+  <script src="/javascripts/build/footer.js"></script>
   </body>
+
+
  </html>

@@ -136,7 +136,8 @@ gulp.task('serve', function () {
   });
 
   gulp.watch(['*.html'], reload);
-  gulp.watch(['stylesheets/**/*.{scss,css}'], ['styles', reload]);
+  gulp.watch(['javascripts/build/*.js'], reload);
+  gulp.watch(['stylesheets/*.{scss,css}'], reload);
   gulp.watch(['scripts/**/*.js'], ['jshint']);
   //gulp.watch(['app/images/**/*'], reload);
 });

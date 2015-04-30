@@ -183,8 +183,13 @@ var CaptionEditBox = React.createClass({
     var value = this.state.value;
     return (
         <div time={this.props.data.time} className="captionEditBox">
-          <textarea value={value} onChange={this.handleChange}></textarea>
-          <button onClick={this.handleSubmit}>Suggest improvement</button>
+          <div className="input-field">
+            <textarea id="suggestedChangeTextArea" className="materialize-textarea" value={value} onChange={this.handleChange}></textarea>
+            <label id="suggestedChangeLabel" htmlFor="suggestedChangeTextArea">Suggest a Change to the Transcription</label>
+          </div>
+          <button className="btn waves-effect waves-light commentSubmitButton" type="submit" name="action" onClick={this.handleSubmit}>Suggest improvement
+            <i className="mdi-content-send right"></i>
+          </button>
         </div>
     )
   }
@@ -363,7 +368,7 @@ var CommentForm = React.createClass({
         <form className="commentForm" onSubmit={this.handleSubmit}>
           <div className="input-field">
             <textarea id="newCommentArea" className="materialize-textarea" value={value} ref="text" onChange={this.handleChange} />
-            <label for="newCommentArea">Add a Comment</label>
+            <label htmlFor="newCommentArea">Add a Comment</label>
           </div>
 
           <button className="btn waves-effect waves-light commentSubmitButton" type="submit" name="action">Post
