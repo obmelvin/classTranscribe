@@ -418,7 +418,7 @@ var CommentBox = React.createClass({displayName: "CommentBox",
     return (
         React.createElement("div", {className: "commentBox"}, 
           React.createElement("a", {className: "toggleSuggestionsButton btn-large waves-effect waves-light blue darken-4", onClick: this.toggleComments}, this.state.showComments ? 'Hide' : 'Show', " Comments"), 
-          React.createElement("div", {className: this.state.showComments ? '' : 'hidden'}, 
+          React.createElement("div", {className: this.state.showComments ? '' : 'hide'}, 
             React.createElement("h5", null, "Comments"), 
             React.createElement(CommentList, {data: this.state.data}), 
             React.createElement(CommentForm, {onCommentSubmit: this.handleCommentSubmit})

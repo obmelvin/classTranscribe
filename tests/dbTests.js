@@ -34,8 +34,50 @@ describe('/api/loadAnnotations', function() {
                 done();
             })
         })
-    })
+    });
+    context('when there are no annotations', function() {
+        it('should return an empty array without throwing an error', function(done) {
+            var videoName = 'Mini Video: ';
+            var annotations = [];
+            server.loadAnnotations(videoName, function(error, results) {
+                expect(results).to.equal(annotations);
+                done();
+            })
+        })
+    });
+});
 
+describe('/api/addAnnotation', function() {
+    context('when a user has permission to add an annotation', function() {
+        it('the api call should return', function(done) {
+            var userID = 9; // omelvin2@illinois.edu
+            var video = 'Mini Video: Hello World';
+            var time = 8;
+            var content = "I meant to say execv";
+            var expectedResult = true;
+            server.addAnnotations(userID, video, time, content, function(error, result) {
+                //TODO: what does MYSQL set results to be?
+                expect(result).to.equal(expectedResult);
+                done();
+            });
+        });
+
+    });
+    context('when a user doesn\'t have permission to add an annotation', function() {
+        it('the api call should fail with status code 507', function(done) {
+            //TODO: use the actual route instead of associated logic method OR test fail in a way that doesn't require HTTP status code
+            var userID = 2; // obmelvin@gmail.com
+            var video = 'Mini Video: Hello World';
+            var time = 8;
+            var content = "I meant to say execv";
+            var expectedResult = null;
+            server.addAnnotations(userID, video, time, content, function(error, result) {
+                //TODO: what does MYSQL set results to be?
+                expect(result).to.equal(expectedResult);
+                done();
+            });
+        })
+    })
 });
 
 describe('/api/suggestTranscriptionChanges', function() {
@@ -52,7 +94,7 @@ describe('/api/suggestTranscriptionChanges', function() {
     })
 });
 
-describe('/api/loadComments', function() {
+describe('/api/getComments', function() {
     context('when getting Hello World video\'s comments', function() {
         it('should have at least these comments', function(done) {
             var videoName = 'Mini Video: Hello World';
@@ -77,42 +119,113 @@ describe('/api/loadComments', function() {
             })
         })
     })
-})
+});
 
+describe('/api/addComments', function() {
+    context('when adding a top level comment', function(done) {
+        it('it should be the to comment', function() {
+            var parentID = 0;
+            var author = 2;
+            var video = 'Mini Video: Hello World';
+            var body = 'unit test comment';
+            server.submitComment(parentID, author, video, body, function(error, results) {
+                expect(results[0]["parentID"]).to.equal(parentID);
+                expect(results[0]["authorID"]).to.equal(author);
+                expect(results[0]["video"]).to.equal(video);
+                expect(results[0]["body"]).to.equal(body);
+                done();
+            })
+        })
+    });
+    context('when adding a comment reply', function(done) {
+        it('should have the correct parentID', function() {
+            var parentID = 5;
+            var author = 2;
+            var video = 'Mini Video: Hello World';
+            var body = 'unit test comment';
+            server.submitComment(parentID, author, video, body, function(error, results) {
+                var index = 5; //what will the index be??
+                expect(results[index]["parentID"]).to.equal(parentID);
+                expect(results[index]["authorID"]).to.equal(author);
+                expect(results[index]["video"]).to.equal(video);
+                expect(results[index]["body"]).to.equal(body);
+                done();
+            })
+        });
+    })
+});
 
+describe('api/addCommentVote', function() {
+    context('when upvoting a comment the user hasn\'t previously voted on', function(done) {
+        it('the comment score should increase by one', function() {
+            var commentID = 5;
+            var userID = 2;
+            server.getCommentScore(commentID, function(error, result) {
+                var oldScore = result["score"];
+                server.submitCommentVote(commentID, userID, true, function(error, result) {
+                    if(!error) {
+                        server.getCommentScore(commentID, function(error, result) {
+                            expect(result["score"]).to.equal(oldScore+1);
+                        })
+                    }
 
-//describe('when new comment', function() {
-//    //before(function() {
-//    //    server.startServer();
-//    //});
-//    context('contains a blacklisted word', function() {
-//        it('should be filtered', function() {
-//            expect(server.filterComment('Justin Bieber is an ass')).to.equal('He Who Must Not Be Named is an apple');
-//        });
-//    });
-//    context('doesn\'t contain a blacklisted word', function() {
-//        it('nothing should be touched', function() {
-//            var comment = 'hello, here is a test comment';
-//            expect(server.filterComment(comment)).to.equal(comment);
-//        });
-//    })
-//});
+                })
+            })
 
-//describe('#indexOf()', function(){
-//    context('when not present', function(){
-//        it('should not throw an error', function(){
-//            (function(){
-//                [1,2,3].indexOf(4);
-//            }).should.not.throw();
-//        });
-//        it('should return -1', function(){
-//            [1,2,3].indexOf(4).should.equal(-1);
-//        });
-//    });
-//    context('when present', function(){
-//        it('should return the index where the element first appears in the array', function(){
-//            [1,2,3].indexOf(3).should.equal(2);
-//        });
-//    });
-//});
-//});
+        })
+    });
+    context('when downvoting a comment the user hasn\'t previously voted on', function(done) {
+        it('the comment score should increase by one', function() {
+            var commentID = 5;
+            var userID = 2;
+            server.getCommentScore(commentID, function(error, result) {
+                var oldScore = result["score"];
+                server.submitCommentVote(commentID, userID, false, function(error, result) {
+                    if(!error) {
+                        server.getCommentScore(commentID, function(error, result) {
+                            expect(result["score"]).to.equal(oldScore-1);
+                        })
+                    }
+
+                })
+            })
+
+        })
+    });
+    context('when upvoting a comment the user has previously downvoted', function(done) {
+        it('the comment score should increase by one', function() {
+            var commentID = 5;
+            var userID = 2;
+            server.getCommentScore(commentID, function(error, result) {
+                var oldScore = result["score"];
+                server.submitCommentVote(commentID, userID, true, function(error, result) {
+                    if(!error) {
+                        server.getCommentScore(commentID, function(error, result) {
+                            expect(result["score"]).to.equal(oldScore+2);
+                        })
+                    }
+
+                })
+            })
+
+        })
+    });
+    context('when downvoting a comment the user has previously upvoted', function(done) {
+        it('the comment score should increase by one', function() {
+            var commentID = 5;
+            var userID = 2;
+            server.getCommentScore(commentID, function(error, result) {
+                var oldScore = result["score"];
+                server.submitCommentVote(commentID, userID, false, function(error, result) {
+                    if(!error) {
+                        server.getCommentScore(commentID, function(error, result) {
+                            expect(result["score"]).to.equal(oldScore-2);
+                        })
+                    }
+
+                })
+            })
+
+        })
+    });
+});

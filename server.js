@@ -151,6 +151,9 @@ app.put('/api/addAnnotation', function (req, res) {
         res.end();
       }
     });
+  } else {
+    res.writeHead(507);
+    res.end();
   }
 });
 
@@ -261,6 +264,7 @@ function submitSuggestionVote(suggestionID, userID, vote, cb) {
     });
   });
 }
+exports.submitSuggestionVote = submitSuggestionVote;
 
 /*
  route handler for loading annotations
@@ -380,8 +384,8 @@ function submitComment(parentID, author, video, body, cb) {
       cb(err, result);
     });
   });
-
 }
+exports.submitComment = submitComment;
 
 /*
  route handler for logging in

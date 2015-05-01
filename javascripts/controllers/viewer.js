@@ -418,7 +418,7 @@ var CommentBox = React.createClass({
     return (
         <div className="commentBox">
           <a className="toggleSuggestionsButton btn-large waves-effect waves-light blue darken-4" onClick={this.toggleComments}>{this.state.showComments ? 'Hide' : 'Show'} Comments</a>
-          <div className={this.state.showComments ? '' : 'hidden'}>
+          <div className={this.state.showComments ? '' : 'hide'}>
             <h5>Comments</h5>
             <CommentList data={this.state.data} />
             <CommentForm onCommentSubmit={this.handleCommentSubmit} />
