@@ -94,6 +94,96 @@ describe('/api/suggestTranscriptionChanges', function() {
     })
 });
 
+describe('/api/submitSuggestionVote', function() {
+    context('when upvoting a suggestion the user hasn\'t previously voted on', function(done) {
+        it('the comment score should increase by one', function() {
+            var suggestionID = 5;
+            var userID = 2;
+            server.getSuggestionScore(suggestionID, function(error, result) {
+                var oldScore = result["score"];
+                server.submitSuggestionVote(suggestionID, userID, true, function(error, result) {
+                    if(!error) {
+                        server.getSuggestionScore(suggestionID, function(error, result) {
+                            expect(result["score"]).to.equal(oldScore+1);
+                            done();
+                        })
+                    }
+                })
+            })
+
+        })
+    });
+    context('when downvoting a suggestion the user hasn\'t previously voted on', function(done) {
+        it('the comment score should decrease by one', function() {
+            var suggestionID = 5;
+            var userID = 2;
+            server.getSuggestionScore(suggestionID, function(error, result) {
+                var oldScore = result["score"];
+                server.submitSuggestionVote(suggestionID, userID, true, function(error, result) {
+                    if(!error) {
+                        server.getSuggestionScore(suggestionID, function(error, result) {
+                            expect(result["score"]).to.equal(oldScore-1);
+                            done();
+                        })
+                    }
+
+                })
+            })
+
+        })
+    });
+    context('when upvoting a suggestion the user hasn\'t previously voted on', function(done) {
+        it('the comment score should increase by two', function() {
+            var suggestionID = 5;
+            var userID = 2;
+            server.getSuggestionScore(suggestionID, function(error, result) {
+                var oldScore = result["score"];
+                server.submitSuggestionVote(suggestionID, userID, true, function(error, result) {
+                    if(!error) {
+                        server.getSuggestionScore(suggestionID, function(error, result) {
+                            expect(result["score"]).to.equal(oldScore+2);
+                            done();
+                        })
+                    }
+                })
+            })
+
+        })
+    });
+    context('when downvoting a suggestion the user hasn\'t previously voted on', function(done) {
+        it('the comment score should decrease by two', function() {
+            var suggestionID = 5;
+            var userID = 2;
+            server.getSuggestionScore(suggestionID, function(error, result) {
+                var oldScore = result["score"];
+                server.submitSuggestionVote(suggestionID, userID, true, function(error, result) {
+                    if(!error) {
+                        server.getSuggestionScore(suggestionID, function(error, result) {
+                            expect(result["score"]).to.equal(oldScore-2);
+                            done();
+                        })
+                    }
+                })
+            })
+
+        })
+    });
+    context('when the score is pushed over the accept threshold', function(done) {
+        it('the suggestion should become part of the official transcription', function() {
+            var suggestionID = 5;
+            //TODO; figure out how we want to merge the changes. will it completely replace the previous version or do we want to store original?
+            done();
+        })
+    });
+    context('when the score is pushed below the reject threshold', function(done) {
+        it('the suggestion should be deleted', function() {
+            var suggestionID = 5;
+            //todo: stuff
+            done();
+        })
+    });
+});
+
 describe('/api/getComments', function() {
     context('when getting Hello World video\'s comments', function() {
         it('should have at least these comments', function(done) {
@@ -175,7 +265,7 @@ describe('api/addCommentVote', function() {
         })
     });
     context('when downvoting a comment the user hasn\'t previously voted on', function(done) {
-        it('the comment score should increase by one', function() {
+        it('the comment score should decrease by one', function() {
             var commentID = 5;
             var userID = 2;
             server.getCommentScore(commentID, function(error, result) {
@@ -193,7 +283,7 @@ describe('api/addCommentVote', function() {
         })
     });
     context('when upvoting a comment the user has previously downvoted', function(done) {
-        it('the comment score should increase by one', function() {
+        it('the comment score should increase by two', function() {
             var commentID = 5;
             var userID = 2;
             server.getCommentScore(commentID, function(error, result) {
@@ -211,7 +301,7 @@ describe('api/addCommentVote', function() {
         })
     });
     context('when downvoting a comment the user has previously upvoted', function(done) {
-        it('the comment score should increase by one', function() {
+        it('the comment score should decrease by two', function() {
             var commentID = 5;
             var userID = 2;
             server.getCommentScore(commentID, function(error, result) {
