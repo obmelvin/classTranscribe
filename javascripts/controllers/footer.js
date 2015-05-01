@@ -10,7 +10,6 @@ var Footer = React.createClass({
                     <div className="row">
                         <div className="col l6 s12">
                             <h5>Class Transcribe</h5>
-                            <p>Created by Bob Ren, Oliver Melvin and Surtai Han</p>
                         </div>
                         <div className="col l4 offset-l2 s12">
                             <h5>Links</h5>
@@ -21,6 +20,11 @@ var Footer = React.createClass({
                                 <li><a href="https://github.com/obmelvin/classTranscribe">Oliver's 242 Forked Repo</a></li>
                             </ul>
                         </div>
+                    </div>
+                </div>
+                <div className="footer-copyright">
+                    <div className="footer-creator-container">
+                        <p>Created by Bob Ren, Oliver Melvin and Surtai Han</p>
                     </div>
                 </div>
             </footer>

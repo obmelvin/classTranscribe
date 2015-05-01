@@ -216,7 +216,7 @@ var SuggestionsBox = React.createClass({
     return (
       <div className="suggestionBox">
         <a className="toggleSuggestionsButton btn-large waves-effect waves-light blue darken-4" onClick={this.toggleSuggestions}>{this.state.showSuggestions ? 'Hide' : 'Show'} Suggestions</a>
-        <div className={this.state.showSuggestions ? '' : 'hidden'}>
+        <div className={this.state.showSuggestions ? '' : 'hide'}>
           <h5>Suggested Transcription Changes</h5>
           <SuggestionList data={this.state.data} />
         </div>
@@ -247,7 +247,7 @@ var Suggestion = React.createClass({
   },
   render: function() {
     return (
-        <div className="suggestion card indigo accent-3">
+        <li className="suggestion card indigo accent-3 collection-item dismissable">
           <div className="card-content">
             <p>{this.props.children}</p>
           </div>
@@ -256,7 +256,7 @@ var Suggestion = React.createClass({
             <div onClick={this.handleVote} className="voteDown icon-action-white icon-action-white-ic_thumb_down_white_24dp"></div>
           </div>
 
-        </div>
+        </li>
     );
   }
 });
@@ -274,9 +274,9 @@ var SuggestionList = React.createClass({
       );
     });
     return (
-        <div className="suggestionList">
+        <ul className="suggestionList">
           {suggestionNodes}
-        </div>
+        </ul>
     );
   }
 });

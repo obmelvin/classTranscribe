@@ -18,6 +18,11 @@ $(document).ready(function () {
         $('.existing-annotations-container')[0]
         //document.getElementById('existing-annotations-container')
     );
+
+    React.render(
+        <CreateAnnotationBox />,
+        $('.create-annotations-container')[0]
+    )
 });
 
 /*
@@ -35,10 +40,15 @@ function begin() {
 var Annotation = React.createClass({
     render: function() {
         return (
-            <div>
+        <div className="annotation card blue-grey lighten-2">
+            <div className="card-content">
+                <span className="card-title white-text">{this.props.author}</span>
                 <p>{this.props.children}</p>
-                <div className="icon-action-black icon-action-black-ic_done_black_24dp"></div>
             </div>
+            <div className="card-action">
+                <i className="mdi-action-done right"></i>
+            </div>
+        </div>
         );
     }
 });
@@ -64,8 +74,12 @@ var CreateAnnotationBox = React.createClass({
     render: function() {
         return (
             <div className="createAnnotationBox">
-                <textarea class="annotation-textarea"></textarea>
-                <button class="add-annotation-button">Add an annotation at the current time</button>
+                <div className="input-field">
+                    <textarea id="add-annotation-textarea" className="annotation-textarea materialize-textarea"></textarea>
+                    <label htmlFor="add-annotation-textarea">Create an Official Annotation</label>
+                </div>
+
+                <a className="add-annotation-button waves-effect waves-light btn">Add an annotation at the current time</a>
             </div>
         );
     }

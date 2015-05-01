@@ -11,11 +11,12 @@ var NavBar = React.createClass({
                 <div className="nav-wrapper indigo darken-4 grey-text text-lighten-3">
                     <a href="#" className="brand-logo center grey-text text-lighten-3">Class Transcribe</a>
                     <ul id="nav-mobile" className="left hide-on-med-and-down grey-text text-lighten-3">
+                        <li><a className="grey-text text-lighten-3" href="/"><i className="mdi-action-home"></i></a></li>
                         <li><a className="grey-text text-lighten-3" href="viewer.html">Viewer</a></li>
-                        <li><a className="grey-text text-lighten-3" href="components.html">First</a></li>
-                        <li><a className="grey-text text-lighten-3" href="javascript.html">JavaScript</a></li>
+                        <li><a className="grey-text text-lighten-3" href="/first/0/user">First</a></li>
+                        <li><a className="grey-text text-lighten-3" href="/second/0/user">Second</a></li>
                     </ul>
-                    <ul className={this.state.isSearchPage ? searchBarClasses : (searchBarClasses + ' hidden')}>
+                    <ul className={this.state.isSearchPage ? (searchBarClasses + ' hidden') : searchBarClasses}>
                         <li>
                             <form>
                                 <div className="input-field grey-text text-lighten-3">
@@ -37,4 +38,6 @@ $(document).ready( function() {
         <NavBar />,
         $(".nav-bar-container")[0]
     );
+
+    $(".button-collapse").sideNav()
 });

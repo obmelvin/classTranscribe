@@ -18,6 +18,11 @@ $(document).ready(function () {
         $('.existing-annotations-container')[0]
         //document.getElementById('existing-annotations-container')
     );
+
+    React.render(
+        React.createElement(CreateAnnotationBox, null),
+        $('.create-annotations-container')[0]
+    )
 });
 
 /*
@@ -35,10 +40,15 @@ function begin() {
 var Annotation = React.createClass({displayName: "Annotation",
     render: function() {
         return (
-            React.createElement("div", null, 
-                React.createElement("p", null, this.props.children), 
-                React.createElement("div", {className: "icon-action-black icon-action-black-ic_done_black_24dp"})
+        React.createElement("div", {className: "annotation card blue-grey lighten-2"}, 
+            React.createElement("div", {className: "card-content"}, 
+                React.createElement("span", {className: "card-title white-text"}, this.props.author), 
+                React.createElement("p", null, this.props.children)
+            ), 
+            React.createElement("div", {className: "card-action"}, 
+                React.createElement("i", {className: "mdi-action-done right"})
             )
+        )
         );
     }
 });
@@ -64,8 +74,12 @@ var CreateAnnotationBox = React.createClass({displayName: "CreateAnnotationBox",
     render: function() {
         return (
             React.createElement("div", {className: "createAnnotationBox"}, 
-                React.createElement("textarea", {class: "annotation-textarea"}), 
-                React.createElement("button", {class: "add-annotation-button"}, "Add an annotation at the current time")
+                React.createElement("div", {className: "input-field"}, 
+                    React.createElement("textarea", {id: "add-annotation-textarea", className: "annotation-textarea materialize-textarea"}), 
+                    React.createElement("label", {htmlFor: "add-annotation-textarea"}, "Create an Official Annotation")
+                ), 
+
+                React.createElement("a", {className: "add-annotation-button waves-effect waves-light btn"}, "Add an annotation at the current time")
             )
         );
     }

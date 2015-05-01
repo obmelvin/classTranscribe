@@ -8,17 +8,24 @@
     <script src="/javascripts/data/videos.js"></script>
     <script src="/javascripts/data/captions.js"></script>
     <script src="/javascripts/build/viewer.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.96.1/js/materialize.min.js"></script>
     <!--<script src="/javascripts/controllers/annotations.js"></script>-->
 
     <!-- End Javascript -->
 
     <!-- Begin Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.96.1/css/materialize.min.css">
     <link rel="stylesheet" type="text/css" href="/stylesheets/reset.css">
     <link rel="stylesheet" type="text/css" href="/stylesheets/annotations.css">
     <link rel="stylesheet" type="text/css" href="/stylesheets/material-design-icons/sprites/css-sprite/sprite-action-black.css">
     <!-- End Stylesheets -->
 </head>
-<body>
+<header>
+    <div class="nav-bar-container"></div>
+</header>
+<main>
+    <body>
     <div class="main-container">
         <div class="header-container">
             <h1>Class Transcribe</h1>
@@ -38,12 +45,16 @@
             <div class="transcription-viewer-container"></div>
         </div>
         <div class="annotations-container">
-
             <div class="existing-annotations-container"></div>
         </div>
-
+        <div class="create-annotations-container"></div>
     </div>
 
+    <script src="/javascripts/build/navbar.js"></script>
+    <script src="/javascripts/build/footer.js"></script>
     <script src="/javascripts/build/annotations.js"></script>
-</body>
+    </body>
+</main>
+<footer class="footer-container"></footer>
+
 </html>

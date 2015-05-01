@@ -68,3 +68,7 @@ main {
 .hidden {
   display: none;
 }
+
+.footer-creator-container {
+  margin-left: 10px;
+}

@@ -216,7 +216,7 @@ var SuggestionsBox = React.createClass({displayName: "SuggestionsBox",
     return (
       React.createElement("div", {className: "suggestionBox"}, 
         React.createElement("a", {className: "toggleSuggestionsButton btn-large waves-effect waves-light blue darken-4", onClick: this.toggleSuggestions}, this.state.showSuggestions ? 'Hide' : 'Show', " Suggestions"), 
-        React.createElement("div", {className: this.state.showSuggestions ? '' : 'hidden'}, 
+        React.createElement("div", {className: this.state.showSuggestions ? '' : 'hide'}, 
           React.createElement("h5", null, "Suggested Transcription Changes"), 
           React.createElement(SuggestionList, {data: this.state.data})
         )
@@ -247,7 +247,7 @@ var Suggestion = React.createClass({displayName: "Suggestion",
   },
   render: function() {
     return (
-        React.createElement("div", {className: "suggestion card indigo accent-3"}, 
+        React.createElement("li", {className: "suggestion card indigo accent-3 collection-item dismissable"}, 
           React.createElement("div", {className: "card-content"}, 
             React.createElement("p", null, this.props.children)
           ), 
@@ -274,7 +274,7 @@ var SuggestionList = React.createClass({displayName: "SuggestionList",
       );
     });
     return (
-        React.createElement("div", {className: "suggestionList"}, 
+        React.createElement("ul", {className: "suggestionList"}, 
           suggestionNodes
         )
     );

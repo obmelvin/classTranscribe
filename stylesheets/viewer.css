@@ -26,7 +26,8 @@
   float: left;
   max-width: 400px;
   margin-left: 5px;
-
+  margin-top: 12px;
+  overflow: hidden;
 }
 
 #suggestedChangeLabel {

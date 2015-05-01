@@ -1,6 +1,6 @@
-* {
-    font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif !important;
-}
+/** {*/
+    /*font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif !important;*/
+/*}*/
 
 .main-container {
     padding-top: 20px;
@@ -53,6 +53,10 @@ h1 {
     max-height: 250px;
     color: gray;
     overflow: scroll;
+}
+
+.create-annotations-container {
+    float: left;
 }
 
 .selected-caption {
